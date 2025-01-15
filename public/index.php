@@ -14,9 +14,9 @@ require_once __DIR__ . '/../core/functions.php';
 
 const BASE_PATH = __DIR__ . '/../';
 
-
-$db = new Database();
-$user = $db->query('SELECT * FROM users WHERE id = 2')->findOrFail();
-dd($user->email);
+/* $db = Database::getInstance();
+$user = $db->query('SELECT * FROM users WHERE id = 4')->findOrFail();
+dd($user->email); 
+ */
 $controller = new Controller();
 $controller->render();

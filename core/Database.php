@@ -6,6 +6,8 @@ use PDO;
 
 class Database
 {
+    use Singleton;
+    
     public $connection;
     public $statement;
 
@@ -13,7 +15,7 @@ class Database
     {
         $password = $_ENV['DB_PW'] ?? '';
         $username = $_ENV['DB_USER_NAME'] ?? '';
-      
+
 
         $dsn = 'mysql:host=' . $_ENV['DB_HOST'] . ';port=' . $_ENV['DB_PORT'] . ';dbname=' . $_ENV['DB_NAME'] . ';charset=' . $_ENV['DB_CHARSET'];
 
