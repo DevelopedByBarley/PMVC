@@ -1,0 +1,18 @@
+{
+    "name": "barley/mvc",
+    "version": "1.0.0",
+    "autoload": {
+        "psr-4": {
+            "Barley\\Mvc\\": "src/",
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Árpád Szaniszló"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
