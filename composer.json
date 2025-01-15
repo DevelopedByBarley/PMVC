@@ -4,7 +4,8 @@
     "autoload": {
         "psr-4": {
             "Barley\\Mvc\\": "src/",
-            "App\\": "app/"
+            "App\\": "app/",
+            "Core\\": "core/"
         }
     },
     "authors": [

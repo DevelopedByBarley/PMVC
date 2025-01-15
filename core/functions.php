@@ -1,32 +1,36 @@
 <?php
 
+function dd($value)
+{
+  echo "<pre>";
+  var_dump($value);
+  echo "</pre>";
+
+  die();
+}
+
+function urlIs($value)
+{
+  return $_SERVER['REQUEST_URI'] === $value;
+}
+
+function abort($code = 404)
+{
+  http_response_code($code);
+
+  require base_path("resources/views/status/{$code}.php");
+
+  die();
+}
 
 function base_path($path)
 {
   return BASE_PATH . $path;
 }
 
-
-function view($path, $params = []): string
+function view($path, $attributes = [])
 {
-  ob_start();
+  extract($attributes);
 
-  extract($params);
-
-  $filePath = base_path('resources/views/' . $path . ".php");
-
-  if (!file_exists($filePath)) {
-    echo 'This file is doesnt exist!';
-    throw new \Exception("View file not found: " . $filePath);
-  }
-
-  require $filePath;
-
-  $output = ob_get_clean();
-
-  if (!headers_sent()) {
-    header("Content-Type: text/html; charset=UTF-8");
-  }
-
-  return $output;
+  require base_path('resources/views/' . $path . '.php');
 }
