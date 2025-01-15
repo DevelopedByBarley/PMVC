@@ -33,12 +33,12 @@ class Database
 
     public function get()
     {
-        return $this->statement->fetchAll();
+        return $this->statement->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function find()
     {
-        return $this->statement->fetch();
+        return $this->statement->fetch(PDO::FETCH_OBJ);
     }
 
     public function findOrFail()

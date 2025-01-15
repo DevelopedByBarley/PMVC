@@ -16,7 +16,7 @@ const BASE_PATH = __DIR__ . '/../';
 
 
 $db = new Database();
-$users = $db->query('SELECT * FROM users WHERE id = 1')->findOrFail();
-dd($users);
+$user = $db->query('SELECT * FROM users WHERE id = 2')->findOrFail();
+dd($user->email);
 $controller = new Controller();
 $controller->render();
