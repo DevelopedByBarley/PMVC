@@ -35,4 +35,5 @@ class Toast
     Redirect::redirectBack();
   }
 }
-  
+
+// Print the toast data
