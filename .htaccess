@@ -3,5 +3,6 @@
 
   # Minden kérést átirányítunk a public mappába
   RewriteCond %{REQUEST_URI} !^/public/
+  RewriteCond %{REQUEST_URI} !^/resources/
   RewriteRule ^(.*)$ /public/$1 [L]
 </IfModule>
