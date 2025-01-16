@@ -1,5 +1,4 @@
 <?php
-use App\Http\Controllers\Controller;
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -15,9 +14,10 @@ $dotenv->safeLoad();
 
 
 
-/* $db = Database::getInstance();
-$user = $db->query('SELECT * FROM users WHERE id = 4')->findOrFail();
-dd($user->email); 
- */
-$controller = new Controller();
-$controller->render();
+$router = new \Core\Router();
+$routes = require base_path('routes/routes.php');
+
+$uri = parse_url($_SERVER['REQUEST_URI'])['path'];
+$method = $_POST['_method'] ?? $_SERVER['REQUEST_METHOD'];
+
+$router->route($uri, $method);
