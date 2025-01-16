@@ -11,7 +11,6 @@
 <body>
 
   <!-- Navbar -->
-
   <?= $root ?>
 
   <!--Footer-->
