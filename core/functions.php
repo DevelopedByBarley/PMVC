@@ -1,6 +1,14 @@
 <?php
 
-use Core\Session;
+
+function errors($key, $errors)
+{
+  if (isset($errors) && !empty($errors)) {
+    foreach ($errors[$key]['errors'] as $error) {
+      echo "<li class='list-unstyled text-danger'>{$error}</li>";  
+    }
+  }
+}
 
 function dd($value)
 {
@@ -35,8 +43,11 @@ function view($path, $attributes = [])
   extract($attributes);
 
   require base_path('resources/views/' . $path . '.view.php');
+}
 
-
+function old($key, $default = '')
+{
+    return Core\Session::get('old')[$key] ?? $default;
 }
 
 
@@ -62,7 +73,7 @@ function filter_sanitize($value)
       return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
     case 'integer':
       return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
-    case 'double': 
+    case 'double':
       return filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     case 'boolean':
       return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
