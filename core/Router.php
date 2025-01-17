@@ -55,7 +55,6 @@ class Router
 
             if (preg_match($pattern, $uri, $matches) && $route['method'] === strtoupper($method)) {
                 array_shift($matches); // Az első elem az egész találat
-
                 // Middleware kezelése
                 if ($route['middleware']) {
                     Middleware::resolve($route['middleware']);
@@ -66,7 +65,11 @@ class Router
                     $controller = $route['controller'][0];
                     $method = $route['controller'][1];
 
-                    (new $controller)->$method(...$matches);
+                    try {
+                        (new $controller)->$method($matches);
+                    } finally {
+                        Session::unflash();
+                    }
                     exit();
                 }
 

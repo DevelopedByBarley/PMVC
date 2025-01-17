@@ -7,19 +7,17 @@ use PDO;
 class Database
 {
     use Singleton;
-    
+
     public $connection;
     public $statement;
 
     public function __construct()
     {
-        $password = $_ENV['DB_PW'] ?? '';
-        $username = $_ENV['DB_USER_NAME'] ?? '';
+        $config = require base_path('config/database.php'); 
+        
+        $dsn = 'mysql:host=' . $config['host'] . ';port=' . $config['port'] . ';dbname=' . $config['db_name'] . ';charset=' . $config['charset'];
 
-
-        $dsn = 'mysql:host=' . $_ENV['DB_HOST'] . ';port=' . $_ENV['DB_PORT'] . ';dbname=' . $_ENV['DB_NAME'] . ';charset=' . $_ENV['DB_CHARSET'];
-
-        $this->connection = new PDO($dsn, $username, $password, [
+        $this->connection = new PDO($dsn, $config['name'], $config['password'], [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ]);
     }

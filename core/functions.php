@@ -1,5 +1,7 @@
 <?php
 
+use Core\Session;
+
 function dd($value)
 {
   echo "<pre>";
@@ -32,5 +34,43 @@ function view($path, $attributes = [])
 {
   extract($attributes);
 
-  require base_path('resources/views/' . $path . '.php');
+  require base_path('resources/views/' . $path . '.view.php');
+
+
+}
+
+
+/**
+ * Általános szűrő és szanitizáló függvény.
+ *
+ * @param mixed $value A bemenet, amit tisztítani szeretnél.
+ * @param string $type A bemenet típusa: 'string', 'int', 'email', 'url', stb.
+ * @return mixed A szűrt és tisztított érték, vagy false, ha a validáció nem sikerült.
+ */
+/**
+ * Általános szűrő és szanitizáló függvény.
+ *
+ * @param mixed $value A bemenet, amit tisztítani szeretnél.
+ * @return mixed A szűrt és tisztított érték, vagy az eredeti érték, ha nem támogatott típus.
+ */
+function filter_sanitize($value)
+{
+  $type = gettype($value);
+
+  switch ($type) {
+    case 'string':
+      return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+    case 'integer':
+      return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+    case 'double': 
+      return filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    case 'boolean':
+      return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    case 'array':
+      return array_map('filter_sanitize', $value);
+    case 'NULL':
+      return null;
+    default:
+      return $value;
+  }
 }

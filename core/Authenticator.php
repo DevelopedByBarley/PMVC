@@ -4,13 +4,13 @@ namespace Core;
 
 class Authenticator
 {
-  public function attempt($table, $email, $password)
+  public function attempt($email, $password, $table = 'users')
   {
-    $db = new Database();
+    $db = Database::getInstance();
+    
     $user = $db->query("SELECT * FROM $table WHERE email = :email", [
       'email' => $email
     ])->find();
-
     if ($user) {
       if (password_verify($password, $user['password'])) {
         $this->login([
@@ -24,7 +24,7 @@ class Authenticator
     return false;
   }
 
-  public function login($entity)
+  public static function login($entity)
   {
     $_SESSION[$entity] = [
       'email' => $entity['email']
@@ -33,7 +33,7 @@ class Authenticator
     session_regenerate_id(true);
   }
 
-  public function logout()
+  public static function logout()
   {
     $_SESSION = [];
     session_destroy();

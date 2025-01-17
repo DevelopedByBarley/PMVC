@@ -2,7 +2,7 @@
 
 namespace Core;
 
-class Redirect
+class Navigator
 {
   public static function redirect($uri = null)
   {
