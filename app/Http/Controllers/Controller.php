@@ -21,8 +21,6 @@ class Controller
 
   public  function render()
   {
-    session_start();
-
     echo view('components/layout', [
       'root' => view('welcome', [])
     ]);

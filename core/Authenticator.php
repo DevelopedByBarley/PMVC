@@ -7,15 +7,13 @@ class Authenticator
   public function attempt($email, $password, $table = 'users')
   {
     $db = Database::getInstance();
-    
+
     $user = $db->query("SELECT * FROM $table WHERE email = :email", [
       'email' => $email
     ])->find();
     if ($user) {
-      if (password_verify($password, $user['password'])) {
-        $this->login([
-          'email' => $email
-        ]);
+      if (password_verify($password, $user->password)) {
+        $this->login('admin', $email);
 
         return true;
       }
@@ -24,10 +22,10 @@ class Authenticator
     return false;
   }
 
-  public static function login($entity)
+  public static function login($entity, $email)
   {
     $_SESSION[$entity] = [
-      'email' => $entity['email']
+      'email' => $email
     ];
 
     session_regenerate_id(true);
