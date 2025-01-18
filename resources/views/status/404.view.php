@@ -1,11 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
 
-<main>
-    <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold">Sorry. Page Not Found.</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/node_modules/bootstrap/dist/css/bootstrap.min.css?v=<?= time() ?>">
+    <title><?= APP_NAME ?></title>
+</head>
 
-        <p class="mt-4">
-            <a href="/" class="text-blue-500 underline">Go back home.</a>
-        </p>
+<body data-bs-theme="dark" class="d-flex align-items-center justify-content-center vh-100">
+    <div class="d-flex align-items-center justify-content-center vh-100 ">
+        <div class="text-center">
+            <h1 class="display-1 fw-bold text-danger">404</h1>
+            <p class="fs-3"> <span class="text-warning">Oops!</span> Page not found.</p>
+            <p class="lead">
+                The page you’re looking for doesn’t exist.
+            </p>
+            <a href="/" class="btn btn-primary">Go Home</a>
+        </div>
     </div>
-</main>
+</body>
 
+</html>

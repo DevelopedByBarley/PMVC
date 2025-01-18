@@ -1,11 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
 
-<main>
-    <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold">You are not authorized to view this page.</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/node_modules/bootstrap/dist/css/bootstrap.min.css?v=<?= time() ?>">
+    <title><?= APP_NAME ?></title>
+</head>
 
-        <p class="mt-4">
-            <a href="/" class="text-blue-500 underline">Go back home.</a>
+<body data-bs-theme="light" class="d-flex align-items-center justify-content-center vh-100 ">
+    <div class="text-center">
+        <h1 class="display-1 fw-bold text-warning">403</h1>
+        <p class="fs-3"> <span class="text-danger">Forbidden!</span> You don’t have permission to access this page.</p>
+        <p class="lead">
+            Please contact the administrator if you believe this is a mistake.
         </p>
+        <a href="/" class="btn btn-primary">Go Home</a>
     </div>
-</main>
+</body>
 
+</html>
