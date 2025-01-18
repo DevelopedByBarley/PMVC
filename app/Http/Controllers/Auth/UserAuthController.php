@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Core\Faker;
 use Core\Navigator;
 use Core\Session;
+use Core\Storage;
 use Core\ValidationException;
 //index, show, create, edit, delete
 
@@ -64,7 +65,7 @@ class UserAuthController extends Controller
   public function login()
   {
     session_start();
-    
+
     try {
       $validated = $this->request->validate([
         "email" => ['required'],
@@ -91,7 +92,9 @@ class UserAuthController extends Controller
 
   public function store()
   {
-    session_start();
+    //dd($_FILES['file']);
+
+
 
     $faker = Faker::create();
     try {

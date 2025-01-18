@@ -37,6 +37,7 @@
 
     return $ret; // Kiíratjuk a struktúrát
   }
-  
+
+  $this->storage->save()
   
   */

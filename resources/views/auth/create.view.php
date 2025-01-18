@@ -4,8 +4,8 @@
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card" style="border-radius: 1rem;">
           <div class="card-body p-5 text-center">
-            <form action="/user" method="POST">
-
+            <form action="/user" method="POST" enctype="multipart/form-data">
+              <?= csrf() ?>
               <div class="mt-md-4 pb-5">
 
                 <h2 class="fw-bold mb-2 text-uppercase">Registration</h2>
@@ -21,6 +21,11 @@
                   <input type="password" name="password" id="password" class="form-control" />
                   <label class="form-label" for="password">Password</label>
                   <?= errors('password', $errors) ?>
+                </div>
+
+                <div class="mb-3">
+                  <label for="formFile" class="form-label">Default file input example</label>
+                  <input class="form-control" type="file" name="file[]" multiple id="formFile">
                 </div>
 
                 <p class="small mb-5 pb-lg-2"><a class="-50" href="/login">Do you have an account? Click here.</a></p>
