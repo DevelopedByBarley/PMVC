@@ -1,5 +1,5 @@
 <?php
- /*  // LEFT JOIN notes ON notes.user_id = users.id
+/*  // LEFT JOIN notes ON notes.user_id = users.id
   public function getWithLeftJoin($selects, $table, $join_table, $id_name, $join_table_id_name)
   {
     // Append LEFT JOIN to the query

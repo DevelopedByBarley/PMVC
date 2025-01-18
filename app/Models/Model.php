@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Core\Database;
+use PDO;
 
 class Model
 {
@@ -13,11 +14,13 @@ class Model
     $this->db = Database::getInstance();
   }
 
-  public function join($table, $join_table_id_name, $id) {
+  public function join($table, $join_table_id_name, $id)
+  {
     return $this->db->query("SELECT * FROM $table WHERE $join_table_id_name = :id", ['id' => $id])->get();
   }
 
-  public function findAll($table, $id) {
+  public function findAll($table, $id)
+  {
     return $this->db->query("SELECT * FROM $table WHERE id = :id", ['id' => $id])->get();
   }
 
@@ -28,14 +31,14 @@ class Model
 
   public function destroy($table, $id)
   {
-      return $this->db->query("DELETE FROM $table WHERE id = :id", ['id' => $id]);
+    return $this->db->query("DELETE FROM $table WHERE id = :id", ['id' => $id]);
   }
-  
+
   public function destroyAll($table, $id)
   {
-      return $this->db->query("DELETE FROM $table");
+    return $this->db->query("DELETE FROM $table");
   }
-  
+
   public function insertIntoTable($table, $data)
   {
     $columns = implode(", ", array_keys($data));
@@ -60,4 +63,30 @@ class Model
   }
 
 
+
+
+
+  /* 
+  $results = (new Model())->leftJoin( "SELECT users.id, users.name, posts.title AS post_title, notes.body FROM users", [
+        ['table' => 'notes', 'on' => 'users.id = notes.user_id'],
+        ['table' => 'posts', 'on' => 'notes.id = posts.note_id']
+      ],
+      'posts.title LIKE "%dsd%"'
+  );
+  */
+
+  public function leftJoin($base_query, $joins = [], $conditions = null)
+  {
+    $query = $base_query;
+
+    foreach ($joins as $join) {
+      $query .= ' LEFT JOIN ' . $join['table'] . ' ON ' . $join['on'];
+    }
+
+    if ($conditions) {
+      $query .= ' WHERE ' . $conditions;
+    }
+
+    return $this->db->query($query)->get(PDO::FETCH_ASSOC);
+  }
 }
