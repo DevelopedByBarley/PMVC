@@ -1,0 +1,311 @@
+.pr-bg {
+  background-color: map-get($colors, 'teal-500');
+}
+
+.sc-bg {
+  background-color: map-get($colors, 'cyan-500');
+}
+
+.pr-font {
+  font-family: $pr-font;
+}
+
+.sc-font {
+  font-family: $sc-font;
+  letter-spacing: 1.4px;
+}
+
+
+body {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+label.required, div.required {
+  position: relative;
+
+  &::after {
+    content: '*';
+    color: red;
+    font-size: 1em;
+    margin-left: 0.25em; // A csillag és a szöveg közötti távolság
+    vertical-align: middle; // Igazítás a szöveg középmagasságához
+  }
+}
+
+
+.skeleton {
+  animation: skeleton-loading 1s linear infinite alternate;
+  opacity: 0.7;
+
+  &-text {
+    width: 100%;
+    height: 0.5rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.125rem;
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(200, 20%, 70%);
+  }
+
+  100% {
+    background-color: hsl(200, 20%, 95%);
+  }
+}
+
+
+
+
+
+
+// Dark theme settings
+[data-bs-theme=dark] {
+  @each $name, $color in $colors {
+    .dark-bg-#{$name} {
+      background-color: map-get($colors, $name) !important;
+    }
+
+    .dark-bg-hover-#{$name} {
+      &:hover {
+        background-color: map-get($colors, $name) !important;
+      }
+    }
+
+    .dark-text-#{$name} {
+      color: map-get($colors, $name) !important;
+    }
+
+    .dark-border-#{$name} {
+      border-color: map-get($colors, $name) !important;
+    }
+  }
+}
+
+// Light theme settings
+[data-bs-theme=light] {
+  @each $name, $color in $colors {
+    .light-bg-#{$name} {
+      background-color: map-get($colors, $name) !important;
+    }
+
+    .light-bg-hover-#{$name} {
+      &:hover {
+        background-color: map-get($colors, $name) !important;
+      }
+
+    }
+
+    .light-text-#{$name} {
+      color: map-get($colors, $name) !important;
+    }
+
+
+
+    .light-border-#{$name} {
+      border-color: map-get($colors, $name) !important;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+// Generate utility classes
+@each $size, $value in $font-sizes {
+  .text-#{$size} {
+    font-size: $value;
+  }
+}
+
+@each $size, $value in $line-heights {
+  .leading-#{$size} {
+    line-height: $value;
+  }
+}
+
+
+// SET height, width, min-h, min-w, max-h, max-w by $sizes
+// Generate utility classes
+// Generate utility classes for heights
+@each $size, $value in $heights {
+  .h-#{$size} {
+    height: $value;
+  }
+
+  .min-h-#{$size} {
+    min-height: $value;
+  }
+
+  .max-h-#{$size} {
+    max-height: $value;
+  }
+}
+
+// Generate utility classes for widths
+@each $size, $value in $widths {
+  .w-#{$size} {
+    width: $value;
+  }
+
+  .min-w-#{$size} {
+    min-width: $value;
+  }
+
+  .max-w-#{$size} {
+    max-width: $value;
+  }
+}
+
+
+
+// SET background color by $colors IN _vars.scss
+@each $name, $color in $colors {
+  .bg-#{$name} {
+    background-color: $color !important;
+  }
+}
+
+
+// SET border-color  by $colors IN _vars.scss
+
+@each $name, $color in $colors {
+  .border-#{$name} {
+    border-color: $color !important;
+  }
+}
+
+
+// SET color  by $colors IN _vars.scss
+
+@each $name, $color in $colors {
+  .text-#{$name} {
+    color: $color;
+  }
+}
+
+
+
+// SET hover-bg  by $colors IN _vars.scss
+
+@each $name, $color in $colors {
+  .hover-bg-#{$name} {
+    &:hover {
+      background-color: $color !important; // Vagy más hover effektus
+    }
+  }
+}
+
+
+// SET hover-color  by $colors IN _vars.scss
+
+@each $name, $color in $colors {
+  .hover-text-#{$name} {
+    &:hover {
+      color: $color; // Vagy más hover effektus
+    }
+  }
+}
+
+
+
+
+// SET hover-border-color  by $colors IN _vars.scss
+
+@each $name, $color in $colors {
+  .hover-border-#{$name} {
+    &:hover {
+      border-color: $color !important; // Vagy más hover effektus
+    }
+  }
+}
+
+// SET transitions  by $transitions IN _vars.scss
+
+@each $name, $transition in $transitions {
+  .transition-#{$name} {
+
+    transition: $transition; // Vagy más hover effektus
+
+  }
+}
+
+
+// SET margins by $margins
+@each $type, $values in $margins {
+  @each $suffix, $size in $values {
+    .#{$type}-#{$suffix} {
+      @if ($type =="m") {
+        margin: $size;
+      }
+
+      @else if ($type =="mt") {
+        margin-top: $size;
+      }
+
+      @else if ($type =="mb") {
+        margin-bottom: $size;
+      }
+
+      @else if ($type =="mr") {
+        margin-right: $size;
+      }
+
+      @else if ($type =="ml") {
+        margin-left: $size;
+      }
+
+      @else if ($type =="my") {
+        margin-block: $size;
+      }
+
+      @else if ($type =="mx") {
+        margin-inline: $size;
+      }
+    }
+  }
+}
+
+
+// SET paddings by $paddings
+
+@each $type, $values in $paddingValues {
+  @each $suffix, $size in $values {
+    .#{$type}-#{$suffix} {
+      @if ($type =="p") {
+        padding: $size;
+      }
+
+      @else if ($type =="pt") {
+        padding-top: $size;
+      }
+
+      @else if ($type =="pb") {
+        padding-bottom: $size;
+      }
+
+      @else if ($type =="pr") {
+        padding-right: $size;
+      }
+
+      @else if ($type =="pl") {
+        padding-left: $size;
+      }
+
+      @else if ($type =="py") {
+        padding-block: $size;
+      }
+
+      @else if ($type =="px") {
+        padding-inline: $size;
+      }
+    }
+  }
+}
