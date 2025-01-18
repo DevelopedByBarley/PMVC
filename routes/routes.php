@@ -24,6 +24,7 @@ $router->get('/test/{id}', function ($id) {
 
 $router->get('/admin', [AdminAuthController::class, 'create']);
 $router->get('/admin/dashboard', [AdminAuthController::class, 'index'])->only('admin');
+$router->get('/admin/logout', [AdminAuthController::class, 'logout'])->only('admin');
 
 
 $router->post('/admin', [AdminAuthController::class, 'store']);

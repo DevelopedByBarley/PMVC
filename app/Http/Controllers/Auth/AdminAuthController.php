@@ -47,7 +47,7 @@ class AdminAuthController extends Controller
 
     try {
       $validated = $this->request->validate([
-        "email" => ['required', 'min:100'],
+        "email" => ['required'],
         "password" => ['required'],
       ]);
     } catch (ValidationException $exception) {
@@ -72,5 +72,12 @@ class AdminAuthController extends Controller
     $this->auth::login('admin', $email);
 
     return Navigator::redirect('/admin/dashboard');
+  }
+
+  public function logout()
+  {
+    $this->auth::logout();
+    return Navigator::redirect('/admin');
+
   }
 }

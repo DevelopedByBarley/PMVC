@@ -1,4 +1,3 @@
-
 <div class="container vh-100 d-flex align-items-center justify-content-center">
   <div class="row w-100">
     <div class="col-4 mx-auto">

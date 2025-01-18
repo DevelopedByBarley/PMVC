@@ -2,16 +2,28 @@
 
 namespace App\Http\Middlewares;
 
-class Auth {
+use Core\Database;
 
+class Auth
+{
+    protected $db = null;
 
-    public function handle() {
-        session_start();
-        if(!isset($_SESSION['user'])) {
-            return header('Location: /login');
-            exit();
-        }
+    public function __construct()
+    {
+        $this->db = Database::getInstance();
     }
 
-
+    public function handle()
+    {
+        session_start();
+        if (!isset($_SESSION['user']) || !$_SESSION['user']) {
+            return header('Location: /login');
+            exit();
+        } else {
+            $email = $_SESSION['user']->email;
+            $user = $this->db->query("SELECT * FROM users WHERE email = :email", [':email' => $email])->find();
+            unset($user->password);
+            $_SESSION['user'] = $user;
+        }
+    }
 }

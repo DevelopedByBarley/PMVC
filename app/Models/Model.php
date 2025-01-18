@@ -13,6 +13,14 @@ class Model
     $this->db = Database::getInstance();
   }
 
+  public function join($table, $join_table_id_name, $id) {
+    return $this->db->query("SELECT * FROM $table WHERE $join_table_id_name = :id", ['id' => $id])->get();
+  }
+
+  public function findAll($table, $id) {
+    return $this->db->query("SELECT * FROM $table WHERE id = :id", ['id' => $id])->get();
+  }
+
   public function find($id, $table)
   {
     return $this->db->query("SELECT * FROM $table WHERE id = :id", ['id' => $id])->find();
@@ -50,4 +58,6 @@ class Model
 
     return $this->db->query($sql, $data);
   }
+
+
 }

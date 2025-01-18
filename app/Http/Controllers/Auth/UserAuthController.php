@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Core\Faker;
 use Core\Navigator;
 use Core\Session;
 use Core\ValidationException;
@@ -15,14 +16,24 @@ class UserAuthController extends Controller
 
   public function index()
   {
+    $user =  Session::get('user');
+
     echo view('components/layout', [
-      'root' => view('auth/index', [])
+      'root' => view('auth/index', [
+        'user' => $user
+      ])
     ]);
   }
 
-  public function show() {
+  public function show()
+  {
+    $user =  Session::get('user');
+    $user->notes = $this->model->join('notes', 'user_id', $user->id);
+
     echo view('components/layout', [
-      'root' => view('auth/show', [])
+      'root' => view('auth/show', [
+        'user' => $user,
+      ])
     ]);
   }
 
@@ -39,8 +50,9 @@ class UserAuthController extends Controller
       ])
     ]);
   }
-  
-  public function loginPage() {
+
+  public function loginPage()
+  {
     session_start();
     echo view('components/layout', [
       'root' => view('auth/store', [
@@ -65,9 +77,6 @@ class UserAuthController extends Controller
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-
-
-
     $email = filter_sanitize($validated['email']) ?? null;
     $password = filter_sanitize($validated['password']) ?? null;
 
@@ -78,8 +87,6 @@ class UserAuthController extends Controller
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    $this->auth::login('user', $email);
-
     return Navigator::redirect('/user/dashboard');
   }
 
@@ -87,6 +94,7 @@ class UserAuthController extends Controller
   {
     session_start();
 
+    $faker = Faker::create();
     try {
       $validated = $this->request->validate([
         "email" => ['required'],
@@ -102,6 +110,7 @@ class UserAuthController extends Controller
     $password = filter_sanitize($validated['password']) ?? null;
 
     $this->model->insertIntoTable('users', [
+      'name' => $faker->name(),
       'email' => $email,
       'password' => password_hash($password, PASSWORD_DEFAULT)
     ]);

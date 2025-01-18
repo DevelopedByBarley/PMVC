@@ -1,14 +1,20 @@
 <?php
 
+use Core\Session;
+
+function session($entity)
+{
+  return Session::get($entity);
+}
 
 function errors($key, $errors)
 {
   if (isset($errors) && !empty($errors)) {
-    if(isset($errors[$key]['errors'])) {
+    if (isset($errors[$key]['errors'])) {
       foreach ($errors[$key]['errors'] as $error) {
         echo "<li class='list-unstyled text-danger'>{$error}</li>";
       }
-    } 
+    }
   }
 }
 
@@ -63,13 +69,9 @@ function mail_temp_path($path)
 }
 
 
-function can($entity) {
-  
-}
+function can($entity) {}
 
-function cannot($entity) {
-
-}
+function cannot($entity) {}
 
 
 /**

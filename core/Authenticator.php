@@ -13,7 +13,7 @@ class Authenticator
     ])->find();
     if ($user) {
       if (password_verify($password, $user->password)) {
-        $this->login('admin', $email);
+        $this->login(rtrim($table, 's'), $email);
 
         return true;
       }
@@ -24,7 +24,7 @@ class Authenticator
 
   public static function login($entity, $email)
   {
-    $_SESSION[$entity] = [
+    $_SESSION[$entity] = (object)[
       'email' => $email
     ];
 
