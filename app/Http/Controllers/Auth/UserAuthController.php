@@ -11,10 +11,18 @@ use Core\ValidationException;
 class UserAuthController extends Controller
 {
 
+
+
   public function index()
   {
     echo view('components/layout', [
       'root' => view('auth/index', [])
+    ]);
+  }
+
+  public function show() {
+    echo view('components/layout', [
+      'root' => view('auth/show', [])
     ]);
   }
 
