@@ -46,6 +46,11 @@ class Router
         return   $this->add('PUT', $uri, $controller);
     }
 
+    public function view($uri, $callback)
+    {
+        return $this->add('GET', $uri, $callback);
+    }
+
     public function route($uri, $method)
     {
         foreach ($this->routes as $route) {
@@ -58,6 +63,11 @@ class Router
                 // Middleware kezelése
                 if ($route['middleware']) {
                     Middleware::resolve($route['middleware']);
+                }
+
+                if (is_callable($route['controller'])) {
+                    echo call_user_func_array($route['controller'], $matches);
+                    exit();
                 }
 
                 // Ha a controller tömb, hívjuk meg a metódust paraméterekkel

@@ -4,9 +4,11 @@
 function errors($key, $errors)
 {
   if (isset($errors) && !empty($errors)) {
-    foreach ($errors[$key]['errors'] as $error) {
-      echo "<li class='list-unstyled text-danger'>{$error}</li>";
-    }
+    if(isset($errors[$key]['errors'])) {
+      foreach ($errors[$key]['errors'] as $error) {
+        echo "<li class='list-unstyled text-danger'>{$error}</li>";
+      }
+    } 
   }
 }
 
@@ -53,6 +55,11 @@ function old($key, $default = '')
 function view_path($path)
 {
   return BASE_PATH . 'resources/views/' . $path . '.view.php';
+}
+
+function mail_temp_path($path)
+{
+  return BASE_PATH . 'resources/views/mail/' . $path . '.mt.php';
 }
 
 

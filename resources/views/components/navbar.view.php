@@ -93,7 +93,7 @@
               <a class="dropdown-item" href="#">Settings</a>
             </li>
             <li>
-              <a class="dropdown-item" href="#">Logout</a>
+              <a class="dropdown-item" href="/logout">Logout</a>
             </li>
           </ul>
         </div>

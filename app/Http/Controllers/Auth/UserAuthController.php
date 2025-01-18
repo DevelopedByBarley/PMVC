@@ -6,22 +6,15 @@ use App\Http\Controllers\Controller;
 use Core\Navigator;
 use Core\Session;
 use Core\ValidationException;
+//index, show, create, edit, delete
 
 class UserAuthController extends Controller
 {
 
-  public function register()
-  {
-    $this->model->insertIntoTable('users', [
-      'email' => "developedbybarley@gmail.com",
-      'password' => password_hash('Csak1enter@test', PASSWORD_DEFAULT)
-    ]);
-  }
-
-  public function show()
+  public function index()
   {
     echo view('components/layout', [
-      'root' => view('auth/show', [])
+      'root' => view('auth/index', [])
     ]);
   }
 
@@ -32,30 +25,27 @@ class UserAuthController extends Controller
       return Navigator::redirect('/user/dashboard');
     }
 
-    //dd(Session::get('errors'));
-
     echo view('components/layout', [
       'root' => view('auth/create', [
         "errors" => Session::get('errors') ?? []
       ])
     ]);
   }
-
-
-  public function login() {
+  
+  public function loginPage() {
     echo view('components/layout', [
       'root' => view('auth/store', [])
     ]);
   }
 
-  public function store()
+
+  public function login()
   {
     session_start();
 
-
     try {
       $validated = $this->request->validate([
-        "email" => ['required', 'min:100'],
+        "email" => ['required'],
         "password" => ['required'],
       ]);
     } catch (ValidationException $exception) {
@@ -80,5 +70,41 @@ class UserAuthController extends Controller
     $this->auth::login('admin', $email);
 
     return Navigator::redirect('/admin/dashboard');
+  }
+
+  public function store()
+  {
+    session_start();
+
+    try {
+      $validated = $this->request->validate([
+        "email" => ['required'],
+        "password" => ['required'],
+      ]);
+    } catch (ValidationException $exception) {
+      Session::flash('errors', $exception->errors);
+      Session::flash('old', $exception->old);
+      return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
+    }
+
+    $email = filter_sanitize($validated['email']) ?? null;
+    $password = filter_sanitize($validated['password']) ?? null;
+
+    $this->model->insertIntoTable('users', [
+      'email' => $email,
+      'password' => password_hash($password, PASSWORD_DEFAULT)
+    ]);
+
+    $this->auth::login('user', $email);
+
+    $this->mailer->prepare("arpadsz@max.hu", "Teszt")->template('test', ['email' => $email])->send();
+
+    return Navigator::redirect('/user/dashboard');
+  }
+
+  public function logout()
+  {
+    $this->auth::logout();
+    return Navigator::redirect('/login');
   }
 }

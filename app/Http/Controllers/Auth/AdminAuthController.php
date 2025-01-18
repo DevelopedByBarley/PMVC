@@ -18,10 +18,10 @@ class AdminAuthController extends Controller
     ]);
   }
 
-  public function show()
+  public function index()
   {
     echo view('components/admin-layout', [
-      'root' => view('admin/show', [])
+      'root' => view('admin/index', [])
     ]);
   }
   public function create()
