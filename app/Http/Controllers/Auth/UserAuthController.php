@@ -33,8 +33,11 @@ class UserAuthController extends Controller
   }
   
   public function loginPage() {
+    session_start();
     echo view('components/layout', [
-      'root' => view('auth/store', [])
+      'root' => view('auth/store', [
+        "errors" => Session::get('errors') ?? []
+      ])
     ]);
   }
 
@@ -60,16 +63,16 @@ class UserAuthController extends Controller
     $email = filter_sanitize($validated['email']) ?? null;
     $password = filter_sanitize($validated['password']) ?? null;
 
-    $authenticated = $this->auth->attempt($email, $password, 'admins');
+    $authenticated = $this->auth->attempt($email, $password, 'users');
 
     if (!$authenticated) {
       Session::flash('old', $this->request->all());
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    $this->auth::login('admin', $email);
+    $this->auth::login('user', $email);
 
-    return Navigator::redirect('/admin/dashboard');
+    return Navigator::redirect('/user/dashboard');
   }
 
   public function store()
