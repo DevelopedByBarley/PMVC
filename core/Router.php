@@ -92,7 +92,7 @@ class Router
     {
         http_response_code($code);
 
-        require base_path("resources/views/status/{$code}.php");
+        require view_path("status/{$code}");
 
         die();
     }

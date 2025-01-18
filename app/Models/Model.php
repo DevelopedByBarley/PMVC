@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Core\Database;
-use Illuminate\Support\Collection;
 
 class Model
 {
@@ -30,4 +29,5 @@ class Model
 
     return $this->db->query($sql, $data);
   }
+
 }

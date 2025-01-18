@@ -5,7 +5,7 @@ function errors($key, $errors)
 {
   if (isset($errors) && !empty($errors)) {
     foreach ($errors[$key]['errors'] as $error) {
-      echo "<li class='list-unstyled text-danger'>{$error}</li>";  
+      echo "<li class='list-unstyled text-danger'>{$error}</li>";
     }
   }
 }
@@ -47,7 +47,21 @@ function view($path, $attributes = [])
 
 function old($key, $default = '')
 {
-    return Core\Session::get('old')[$key] ?? $default;
+  return Core\Session::get('old')[$key] ?? $default;
+}
+
+function view_path($path)
+{
+  return BASE_PATH . 'resources/views/' . $path . '.view.php';
+}
+
+
+function can($entity) {
+  
+}
+
+function cannot($entity) {
+
 }
 
 

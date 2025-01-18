@@ -7,12 +7,12 @@ use Core\Navigator;
 use Core\Session;
 use Core\ValidationException;
 
-class AdminAuthController extends Controller
+class UserAuthController extends Controller
 {
 
   public function register()
   {
-    $this->model->insertIntoTable('admins', [
+    $this->model->insertIntoTable('users', [
       'email' => "developedbybarley@gmail.com",
       'password' => password_hash('Csak1enter@test', PASSWORD_DEFAULT)
     ]);
@@ -20,23 +20,31 @@ class AdminAuthController extends Controller
 
   public function show()
   {
-    echo view('components/admin-layout', [
-      'root' => view('admin/show', [])
+    echo view('components/layout', [
+      'root' => view('auth/show', [])
     ]);
   }
+
   public function create()
   {
     session_start();
-    if (Session::get('admin')) {
-      return Navigator::redirect('/admin/dashboard');
+    if (Session::get('user')) {
+      return Navigator::redirect('/user/dashboard');
     }
 
     //dd(Session::get('errors'));
 
-    echo view('components/admin-layout', [
-      'root' => view('admin/create', [
+    echo view('components/layout', [
+      'root' => view('auth/create', [
         "errors" => Session::get('errors') ?? []
       ])
+    ]);
+  }
+
+
+  public function login() {
+    echo view('components/layout', [
+      'root' => view('auth/store', [])
     ]);
   }
 

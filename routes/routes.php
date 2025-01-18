@@ -3,6 +3,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Controller;
 
 $router->get('/', [Controller::class, 'render']);
@@ -17,3 +18,9 @@ $router->get('/admin/dashboard', [AdminAuthController::class, 'show'])->only('ad
 
 $router->post('/admin', [AdminAuthController::class, 'store']);
 $router->post('/admin/register', [AdminAuthController::class, 'register']);
+
+
+// User Auth Routes
+
+$router->get('/login', [UserAuthController::class, 'login']);
+$router->get('/register', [UserAuthController::class, 'create']);
