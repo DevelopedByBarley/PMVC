@@ -6,6 +6,8 @@
           <div class="card-body p-5 text-center">
 
             <form action="/login" method="POST">
+              <?= csrf() ?>
+
               <div class="mt-md-4 pb-5">
 
                 <h2 class="fw-bold mb-2 text-uppercase">Login</h2>

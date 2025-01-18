@@ -38,8 +38,8 @@ $router->get('/register', [UserAuthController::class, 'create']);
 
 
 $router->get('/user/dashboard', [UserAuthController::class, 'index'])->only('auth');
-$router->get('/logout', [UserAuthController::class, 'logout'])->only('auth');
 $router->get('/user/profile', [UserAuthController::class, 'show'])->only('auth');
 
+$router->post('/logout', [UserAuthController::class, 'logout'])->only('auth');
 $router->post('/user', [UserAuthController::class, 'store']);
 $router->post('/login', [UserAuthController::class, 'login']);

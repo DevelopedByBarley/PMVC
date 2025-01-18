@@ -36,7 +36,7 @@ function abort($code = 404)
 {
   http_response_code($code);
 
-  require base_path("resources/views/status/{$code}.php");
+  require base_path("resources/views/status/{$code}.view.php");
 
   die();
 }
@@ -108,3 +108,8 @@ function filter_sanitize($value)
       return $value;
   }
 }
+
+  function csrf()
+  {
+    (new \Core\CSRF)->generate()->input();
+  }

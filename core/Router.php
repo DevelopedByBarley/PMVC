@@ -53,10 +53,15 @@ class Router
 
     public function route($uri, $method)
     {
+        $csrfProtectedMethods = ['POST', 'DELETE', 'PATCH', 'PUT'];
+        $csrf_config = require base_path('config/auth.php');
+
+
         foreach ($this->routes as $route) {
             // Konvertáljuk az útvonalat regex mintává
             $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '([^/]+)', $route['uri']);
             $pattern = "#^" . $pattern . "$#";
+
 
             if (preg_match($pattern, $uri, $matches) && $route['method'] === strtoupper($method)) {
                 array_shift($matches); // Az első elem az egész találat
@@ -73,10 +78,16 @@ class Router
                 // Ha a controller tömb, hívjuk meg a metódust paraméterekkel
                 if (is_array($route['controller'])) {
                     $controller = $route['controller'][0];
-                    $method = $route['controller'][1];
+                    $fn = $route['controller'][1];
+                    $method = $route['method'];
+
+
+                    if (in_array(strtoupper($method), $csrfProtectedMethods) && $csrf_config['csrf']['protect']) {
+                        (new CSRF)->check();
+                    }
 
                     try {
-                        (new $controller)->$method($matches);
+                        (new $controller)->$fn($matches);
                     } finally {
                         Session::unflash();
                     }

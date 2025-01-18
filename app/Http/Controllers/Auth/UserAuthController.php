@@ -13,7 +13,6 @@ class UserAuthController extends Controller
 {
 
 
-
   public function index()
   {
     $user =  Session::get('user');
@@ -65,7 +64,7 @@ class UserAuthController extends Controller
   public function login()
   {
     session_start();
-
+    
     try {
       $validated = $this->request->validate([
         "email" => ['required'],
@@ -111,9 +110,12 @@ class UserAuthController extends Controller
 
     $this->model->insertIntoTable('users', [
       'name' => $faker->name(),
+      'phone' => $faker->phoneNumber(),
+      'BIO' => $faker->text(100),
       'email' => $email,
       'password' => password_hash($password, PASSWORD_DEFAULT)
     ]);
+
 
     $this->auth::login('user', $email);
 

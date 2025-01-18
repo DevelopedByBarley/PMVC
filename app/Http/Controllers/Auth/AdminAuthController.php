@@ -31,8 +31,6 @@ class AdminAuthController extends Controller
       return Navigator::redirect('/admin/dashboard');
     }
 
-    //dd(Session::get('errors'));
-
     echo view('components/admin-layout', [
       'root' => view('admin/create', [
         "errors" => Session::get('errors') ?? []

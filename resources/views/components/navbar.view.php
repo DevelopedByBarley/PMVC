@@ -92,8 +92,11 @@
             <li>
               <a class="dropdown-item" href="#">Settings</a>
             </li>
-            <li>
-              <a class="dropdown-item" href="/logout">Logout</a>
+            <li class="dropdown-item">
+              <form action="/logout" method="POST">
+                <?= csrf() ?>
+                <button type="submit">Log out</button>
+              </form>
             </li>
           </ul>
         </div>
