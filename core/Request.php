@@ -13,6 +13,10 @@
       return $_POST;
     }
 
+    public function key($key){
+      return $this->request[$key];
+    }
+
     public function validate($rules) {
       return Validator::validate($this->request, $rules);
     }

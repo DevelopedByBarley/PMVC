@@ -69,6 +69,11 @@ function mail_temp_path($path)
 }
 
 
+function paginate($paginated) {
+  require view_path('components/pagination');
+}
+
+
 function can($entity) {}
 
 function cannot($entity) {}

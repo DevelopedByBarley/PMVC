@@ -19,6 +19,12 @@ class Model
     return $this->db->query("SELECT * FROM $table WHERE $join_table_id_name = :id", ['id' => $id])->get();
   }
 
+
+  public function all($table, $withPaginate = false)
+  {
+    return !$withPaginate ? $this->db->query("SELECT * FROM $table")->get() :  $this->db->prepare("SELECT * FROM $table")->paginate();
+  }
+
   public function findAll($table, $id)
   {
     return $this->db->query("SELECT * FROM $table WHERE id = :id", ['id' => $id])->get();
@@ -60,6 +66,32 @@ class Model
     $sql = "UPDATE $table SET $set WHERE $condition";
 
     return $this->db->query($sql, $data);
+  }
+
+  public function paginateByQuery($base_query, $limit = 10)
+  {
+    return $this->db->prepare($base_query)->paginate($limit);
+  }
+
+  public static function paginate($data)
+  {
+    $itemsPerPage = 5; // Egy oldalon lévő elemek száma
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Aktuális oldal
+    $totalRecords = count($data); // Összes elem száma
+    $totalPages = ceil($totalRecords / $itemsPerPage); // Összes oldal száma
+
+    // Oldal adatok kiválasztása
+    $startIndex = ($currentPage - 1) * $itemsPerPage;
+    $dataForPage = array_slice($data, $startIndex, $itemsPerPage);
+
+    // Válasz formázása
+    return [
+      'data' => $dataForPage,
+      'total_records' => $totalRecords,
+      'total_pages' => $totalPages,
+      'current_page' => $currentPage,
+      'items_per_page' => $itemsPerPage,
+    ];
   }
 
 

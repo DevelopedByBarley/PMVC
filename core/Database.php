@@ -89,7 +89,37 @@ class Database
         return $result;
     }
 
-    public function debug() {
+    public function debug()
+    {
         return $this->query;
+    }
+
+    public function paginate($itemsPerPage = 10, $currentPage = null)
+    {
+        $currentPage = $currentPage ?? ($_GET['offset'] ?? 1);
+        $currentPage = max((int)$currentPage, 1);   
+
+        $countQuery = preg_replace('/SELECT .*? FROM/', 'SELECT COUNT(*) as total FROM', $this->query, 1);
+        $countStmt = $this->connection->prepare($countQuery);
+        $countStmt->execute();
+        $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        $totalPages = (int)ceil($totalRecords / $itemsPerPage);
+        $offset = ($currentPage - 1) * $itemsPerPage;
+
+        // Limit hozzáadása a lekérdezéshez
+        $paginatedQuery = $this->query . " LIMIT :limit OFFSET :offset";
+        $this->statement = $this->connection->prepare($paginatedQuery);
+        $this->statement->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
+        $this->statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $this->statement->execute();
+
+        return [
+            'data' => $this->statement->fetchAll(PDO::FETCH_ASSOC),
+            'total_records' => $totalRecords,
+            'total_pages' => $totalPages,
+            'current_page' => $currentPage,
+            'items_per_page' => $itemsPerPage,
+        ];
     }
 }

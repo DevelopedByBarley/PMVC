@@ -4,7 +4,7 @@
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card" style="border-radius: 1rem;">
           <div class="card-body p-5 text-center">
-
+            <?php paginate($paginated) ?>
             <form action="/login" method="POST">
               <?= csrf() ?>
               <div class="mt-md-4 pb-5">

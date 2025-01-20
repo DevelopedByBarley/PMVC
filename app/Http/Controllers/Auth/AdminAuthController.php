@@ -21,7 +21,9 @@ class AdminAuthController extends Controller
   public function index()
   {
     echo view('components/admin-layout', [
-      'root' => view('admin/index', [])
+      'root' => view('admin/index', [
+        "paginated" => $this->model->paginateByQuery("SELECT * FROM users WHERE id > 30")
+      ])
     ]);
   }
   public function create()

@@ -2,6 +2,7 @@
   <div class="row w-100">
     <div class="col-4 mx-auto">
       <form method="POST" action="/admin">
+        <?= csrf() ?>
         <h2>Admin</h2>
         <hr class="mb-3">
         <div class="mb-3">
