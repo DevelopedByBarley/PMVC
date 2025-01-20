@@ -10,3 +10,4 @@ validator();
 toast();
 theme();
 cookie();
+blur();
