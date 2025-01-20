@@ -17,6 +17,9 @@
         </p>
         <a href="/" class="btn btn-primary">Go Home</a>
     </div>
+
+    <script type="module" src="/resources/dist/bundle.js?v=<?= time() ?>"></script>
+
 </body>
 
 </html>
