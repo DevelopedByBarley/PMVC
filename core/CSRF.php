@@ -43,10 +43,11 @@ class CSRF
       abort(403);
       exit;
     }
-
+    
     if (!Session::get('csrf')) {
       header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request');
       header('X-E-Message: SESSION problem in CSRF Token');
+      dd('hello');
       abort(403);
 
       exit;

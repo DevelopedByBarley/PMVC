@@ -1,6 +1,6 @@
 <?php
 return [
-  'active' => 0,
+  'active' => 1,
   'host' => $_ENV['DB_HOST'] ?? 'localhost',
   'port' => $_ENV['DB_PORT'] ?? 3306,
   'name' => $_ENV['DB_USER_NAME'] ?? 'root',

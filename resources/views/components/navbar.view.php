@@ -13,9 +13,8 @@
         <li class="nav-item">
           <a class="nav-link btn-dark " href="/admin">Admin</a>
         </li>
-        <li class="nav-item dropdown">
+        <!--   <li class="nav-item dropdown">
           <a class="nav-link btn-dark dropdown-toggle " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <?= strtolower($_COOKIE['lang']) ?>
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li>
@@ -23,34 +22,36 @@
             </li>
             <li><a href="/lang/en" class="dropdown-item">en</a></li>
           </ul>
-        </li>
+        </li> -->
         <li class="nav-item">
           <a class="nav-link btn-dark disabled " href="#" tabindex="-1" aria-disabled="true">Disabled</a>
         </li>
       </ul>
-      <?php if (isset($_SESSION['user'])) : ?>
-        <div class="btn-group dropstart d-none d-lg-block">
+      <?php if (session('user')) : ?>
+        <div class="btn-group dropstart d-none d-xl-block">
           <div class="dropdown">
             <button class="btn  dropdown-toggle p-1 " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="<?= "/public/assets/uploads/images/$user->fileName" ?? 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp' ?>" class="avatar img-fluid rounded-circle" style="height: 30px; width: 30px;" alt="">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp" class="avatar img-fluid rounded-circle" style="height: 30px; width: 30px;" alt="">
             </button>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="#">Action</a></li>
               <li><a class="dropdown-item" href="#">Another action</a></li>
               <li><a class="dropdown-item" href="#">Something else here</a></li>
               <li>
-                <form action="/user/logout" class="px-5" method="POST">
-                  <?= $csrf->generate() ?>
-                  <button class="btn btn-danger " type="submit">Logout</button>
+                <form action="/logout" method="POST">
+                  <?= csrf() ?>
+                  <button type="submit">Log out</button>
                 </form>
               </li>
             </ul>
           </div>
+
+
         </div>
-        <div class="btn-group dropend d-lg-none">
+        <div class="btn-group dropend d-xl-none">
           <div class="dropdown">
             <button class="btn  dropdown-toggle p-1 " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="<?= "/public/assets/uploads/images/$user->fileName" ?? 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp' ?>" class="avatar img-fluid rounded-circle" style="height: 30px; width: 30px;" alt="">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp" class="avatar img-fluid rounded-circle" style="height: 30px; width: 30px;" alt="">
             </button>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="#">Action</a></li>
@@ -84,10 +85,3 @@
     </div>
   </div>
 </nav>
-
-
-
-
-
-
-
