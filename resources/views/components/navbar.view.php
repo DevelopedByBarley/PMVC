@@ -1,5 +1,4 @@
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg border-bottom fixed-top sc-font bg-light dark-bg-slate-800">
+<nav class="navbar navbar-expand-lg border-bottom fixed-top pr-font bg-light dark-bg-slate-800">
   <div class="container ">
     <a class="navbar-brand " href="/">Brand</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -13,8 +12,9 @@
         <li class="nav-item">
           <a class="nav-link btn-dark " href="/admin">Admin</a>
         </li>
-        <!--   <li class="nav-item dropdown">
+      <!--   <li class="nav-item dropdown">
           <a class="nav-link btn-dark dropdown-toggle " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li>
@@ -28,26 +28,25 @@
         </li>
       </ul>
       <?php if (session('user')) : ?>
-        <div class="btn-group dropstart d-none d-xl-block">
+        <div class="btn-group dropstart d-none d-lg-block">
           <div class="dropdown">
             <button class="btn  dropdown-toggle p-1 " type="button" data-bs-toggle="dropdown" aria-expanded="false">
               <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp" class="avatar img-fluid rounded-circle" style="height: 30px; width: 30px;" alt="">
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="/profile">Profile</a></li>
               <li><a class="dropdown-item" href="#">Another action</a></li>
               <li><a class="dropdown-item" href="#">Something else here</a></li>
               <li>
-                <form action="/logout" method="POST">
+                <form action="/logout" class="px-5" method="POST">
                   <?= csrf() ?>
-                  <button type="submit">Log out</button>
+                  <button class="btn btn-danger " type="submit">Logout</button>
                 </form>
               </li>
             </ul>
           </div>
-
         </div>
-        <div class="btn-group dropend d-xl-none">
+        <div class="btn-group dropend d-lg-none">
           <div class="dropdown">
             <button class="btn  dropdown-toggle p-1 " type="button" data-bs-toggle="dropdown" aria-expanded="false">
               <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp" class="avatar img-fluid rounded-circle" style="height: 30px; width: 30px;" alt="">
@@ -57,9 +56,9 @@
               <li><a class="dropdown-item" href="#">Another action</a></li>
               <li><a class="dropdown-item" href="#">Something else here</a></li>
               <li>
-                <form action="/logout" method="POST">
+                <form action="/logout" class="px-5" method="POST">
                   <?= csrf() ?>
-                  <button type="submit">Log out</button>
+                  <button class="btn btn-danger " type="submit">Logout</button>
                 </form>
               </li>
             </ul>

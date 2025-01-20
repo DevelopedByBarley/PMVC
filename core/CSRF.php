@@ -18,28 +18,22 @@ class CSRF
     $this->request = new Request();
   }
 
-  // Token generálás
   public function generate()
   {
     $this->token = bin2hex(random_bytes(32));
     $encodedToken = hash_hmac('sha256',  $this->token, $this->secret);
 
-    if (empty(Session::get('csrf'))) {
-      if (isset($_SESSION['csrf']) && is_array($_SESSION['csrf'])) {
-        // Ha már van csrf tömb a session-ben, akkor adjuk hozzá a generált tokent
-        $_SESSION['csrf'][] =  [
-          'token' => $encodedToken,
-          'expiry' => time() + $this->lifeTime
-        ];
-      } else {
-        // Ha még nincs csrf tömb a session-ben, akkor hozzunk létre újat és tegyük bele a generált tokent
-        $_SESSION['csrf'] = [[
-          'token' => $encodedToken,
-          'expiry' => time() + $this->lifeTime
-        ]];
-      }
+    if (isset($_SESSION['csrf']) && is_array($_SESSION['csrf'])) {
+      $_SESSION['csrf'][] =  [
+        'token' => $encodedToken,
+        'expiry' => time() + $this->lifeTime
+      ];
+    } else {
+      $_SESSION['csrf'] = [[
+        'token' => $encodedToken,
+        'expiry' => time() + $this->lifeTime
+      ]];
     }
-
 
     return $this;
   }
@@ -53,8 +47,6 @@ class CSRF
     $post_csrf = $this->request->key('csrf');
     $session_csrf_arr = Session::get('csrf');
 
-
-
     if (!isset($post_csrf)) {
       abort(419);
       exit;
@@ -64,25 +56,29 @@ class CSRF
       abort(419);
       exit;
     }
-    foreach ($session_csrf_arr  as $session_csrf) {
-      $token = hash_hmac('sha256', $_POST['csrf'], $this->secret);
+
+    $token = hash_hmac('sha256', $post_csrf, $this->secret);
+
+    $valid_token_found = false;
+
+    foreach ($session_csrf_arr as $session_csrf) {
       if (hash_equals($session_csrf['token'], $token)) {
-        Session::unset('csrf');
+        $valid_token_found = true;
         break;
       }
     }
 
-    if (!$this->isSafeOrigin()) {
+    if (!$valid_token_found) {
+      abort(419);
       exit;
     }
-
-    Session::unset('csrf');
-    return true;
 
     if (!$this->isSafeOrigin()) {
       abort(419);
       exit;
     }
+
+    Session::unset('csrf');
 
     return true;
   }

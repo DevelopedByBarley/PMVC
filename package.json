@@ -1,28 +1,14 @@
 {
-  "name": "pmvc",
+  "name": "public",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "dev": "webpack serve"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.7.2",
-    "bootstrap": "^5.3.3",
-    "cli": "^1.0.1",
-    "lodash": "^4.17.21"
-  },
-  "devDependencies": {
-    "css-loader": "^7.1.2",
-    "sass": "^1.83.4",
-    "sass-loader": "^16.0.4",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.0"
+    "bootstrap": "^5.3.3"
   }
 }

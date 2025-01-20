@@ -28,6 +28,7 @@ class UserAuthController extends Controller
   public function show()
   {
     $user =  Session::get('user');
+    $user->notes = $this->model->join('notes', 'user_id', $user->id);
 
     echo view('components/layout', [
       'root' => view('auth/show', [
@@ -40,7 +41,7 @@ class UserAuthController extends Controller
   {
     session_start();
     if (Session::get('user')) {
-      return Navigator::redirect('/user/dashboard');
+      return Navigator::redirect('/dashboard');
     }
 
     echo view('components/layout', [
@@ -53,8 +54,10 @@ class UserAuthController extends Controller
   public function loginPage()
   {
     session_start();
+    $paginated = $this->model->all('users', true);    
     echo view('components/layout', [
       'root' => view('auth/store', [
+        "paginated" => $paginated,
         "errors" => Session::get('errors') ?? []
       ])
     ]);
@@ -86,7 +89,7 @@ class UserAuthController extends Controller
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    return Navigator::redirect('/user/dashboard');
+    return Navigator::redirect('/dashboard');
   }
 
   public function store()
@@ -123,7 +126,7 @@ class UserAuthController extends Controller
 
     $this->mailer->prepare("arpadsz@max.hu", "Teszt")->template('test', ['email' => $email])->send();
 
-    return Navigator::redirect('/user/dashboard');
+    return Navigator::redirect('/dashboard');
   }
 
   public function logout()

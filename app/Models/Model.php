@@ -11,8 +11,7 @@ class Model
 
   public function __construct()
   {
-    $db_config = require base_path('config/database.php');
-    $this->db = $db_config['active'] ? Database::getInstance() : null;
+    $this->db = Database::getInstance();
   }
 
   public function join($table, $join_table_id_name, $id)
