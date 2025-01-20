@@ -16,7 +16,8 @@
   
   <?= $root ?>
   
-  <!--Footer-->
+  <?php require_once view_path('components/cookie-banner') ?>
+
   
   <script type="module" src="/resources/js/main.js"></script>
   <script src="resources/bootstrap/js/bootstrap.bundle.js?v=<?= time() ?>"></script>
