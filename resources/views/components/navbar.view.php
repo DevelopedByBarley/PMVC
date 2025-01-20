@@ -1,112 +1,93 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary position-fixed top-0 w-100">
-  <div class="container">
-    <!-- Toggle button -->
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-lg border-bottom fixed-top sc-font bg-light dark-bg-slate-800">
+  <div class="container ">
+    <a class="navbar-brand " href="/">Brand</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-
-    <!-- Collapsible wrapper -->
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!-- Navbar brand -->
-      <a class="navbar-brand mt-2 mt-lg-0" href="#">
-        <img
-          src=""
-          height="15"
-          alt=""
-          loading="lazy" />
-      </a>
-      <!-- Left links -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" href="/">Home</a>
+          <a class="nav-link btn-dark " href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn-dark " href="/admin">Admin</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link btn-dark dropdown-toggle " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <?= strtolower($_COOKIE['lang']) ?>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <a href="/lang/hu" class="dropdown-item">hu</a>
+            </li>
+            <li><a href="/lang/en" class="dropdown-item">en</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn-dark disabled " href="#" tabindex="-1" aria-disabled="true">Disabled</a>
         </li>
       </ul>
+      <?php if (isset($_SESSION['user'])) : ?>
+        <div class="btn-group dropstart d-none d-lg-block">
+          <div class="dropdown">
+            <button class="btn  dropdown-toggle p-1 " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="<?= "/public/assets/uploads/images/$user->fileName" ?? 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp' ?>" class="avatar img-fluid rounded-circle" style="height: 30px; width: 30px;" alt="">
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+              <li>
+                <form action="/user/logout" class="px-5" method="POST">
+                  <?= $csrf->generate() ?>
+                  <button class="btn btn-danger " type="submit">Logout</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="btn-group dropend d-lg-none">
+          <div class="dropdown">
+            <button class="btn  dropdown-toggle p-1 " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="<?= "/public/assets/uploads/images/$user->fileName" ?? 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp' ?>" class="avatar img-fluid rounded-circle" style="height: 30px; width: 30px;" alt="">
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+              <li>
+                <form action="/logout" method="POST">
+                  <?= csrf() ?>
+                  <button type="submit">Log out</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+
+
+        </div>
+      <?php else : ?>
+        <div>
+          <a href="/register" class="btn btn-dark m-1 border-0" type="submit">Register</a>
+          <a href="/login" class="btn btn-dark m-1 border-0" type="submit">Login</a>
+        </div>
+      <?php endif ?>
+      <div class="form-check form-switch theme-switcher p-0 mx-xl-3 mt-2 mt-xl-0">
+        <input type="checkbox" class="form-check-input checkbox text-2xl" role="switch" id="theme-toggle">
+        <label for="theme-toggle" class="dark-bg-sky-700 bg-gray-300 checkbox-label">
+          <i class="fas fa-moon"></i>
+          <i class="fas fa-sun"></i>
+          <span class="ball"></span>
+        </label>
+      </div>
     </div>
-    <!-- Collapsible wrapper -->
-
-    <!-- Right elements -->
-    <?php if (isset($_SESSION['user'])): ?>
-      <div class="d-flex align-items-center">
-        <!-- Icon -->
-        <a class="link-secondary me-3" href="#">
-          <i class="fas fa-shopping-cart"></i>
-        </a>
-
-        <!-- Notifications -->
-        <div class="dropdown">
-          <a
-            class="link-secondary me-3 dropdown-toggle hidden-arrow"
-            href="#"
-            id="navbarDropdownMenuLink"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
-            <i class="fas fa-bell"></i>
-            <span class="badge rounded-pill badge-notification bg-danger">1</span>
-          </a>
-          <ul
-            class="dropdown-menu dropdown-menu-end"
-            aria-labelledby="navbarDropdownMenuLink">
-            <li>
-              <a class="dropdown-item" href="#">Some news</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#">Another news</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Avatar -->
-        <div class="dropdown">
-          <a
-            class="dropdown-toggle d-flex align-items-center hidden-arrow"
-            href="#"
-            id="navbarDropdownMenuAvatar"
-            role="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
-            <img
-              src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
-              class="rounded-circle"
-              height="25"
-              alt="Black and White Portrait of a Man"
-              loading="lazy" />
-          </a>
-          <ul
-            class="dropdown-menu dropdown-menu-end"
-            aria-labelledby="navbarDropdownMenuAvatar">
-            <li>
-              <a class="dropdown-item" href="/user/profile">My profile</a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#">Settings</a>
-            </li>
-            <li class="dropdown-item">
-              <form action="/logout" method="POST">
-                <?= csrf() ?>
-                <button type="submit">Log out</button>
-              </form>
-            </li>
-          </ul>
-        </div>
-      </div>
-    <?php else: ?>
-      <div class="btn-group">
-        <a href="/login" class="btn">Log in</a>
-        <a href="/register" class="btn">Register</a>
-      </div>
-    <?php endif ?>
   </div>
 </nav>
-<!-- Navbar -->
+
+
+
+
+
+
+

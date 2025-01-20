@@ -11,7 +11,7 @@ class Model
 
   public function __construct()
   {
-    $db_config = base_path('config/database.php');
+    $db_config = require base_path('config/database.php');
     $this->db = $db_config['active'] ? Database::getInstance() : null;
   }
 

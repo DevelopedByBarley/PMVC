@@ -7,7 +7,7 @@
   <title><?= APP_NAME ?></title>
 </head>
 
-<body class="bg-red-100" data-bs-theme="dark">
+<body >
 
   <?php require_once view_path('components/navbar') ?>
 
