@@ -14,7 +14,7 @@
     }
 
     public function key($key){
-      return $this->request[$key];
+      return $this->request[$key] ?? null;
     }
 
     public function validate($rules) {

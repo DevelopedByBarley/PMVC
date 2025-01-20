@@ -24,12 +24,18 @@ class Session
     $_SESSION['_flash'][$key] = $value;
   }
 
+  public static  function unset($key)
+  {
+    unset($_SESSION[$key]);
+  }
+
   public static function unflash()
   {
     unset($_SESSION['_flash']);
   }
 
-  public static function flush() {
+  public static function flush()
+  {
     $_SESSION = [];
   }
 }

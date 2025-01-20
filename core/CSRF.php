@@ -8,24 +8,38 @@ class CSRF
   private $lifeTime;
   private $token = 'dsadsddda';
   public $tokens = [];
+  private $request;
 
   public function __construct()
   {
     $config = require base_path('config/auth.php');
     $this->secret = $config['csrf']['secret'];
     $this->lifeTime = $config['csrf']['lifetime'];
+    $this->request = new Request();
   }
 
   // Token generálás
   public function generate()
   {
     $this->token = bin2hex(random_bytes(32));
+    $encodedToken = hash_hmac('sha256',  $this->token, $this->secret);
 
-    // A generált token tárolása a session-ben
-    $_SESSION['csrf'] = [
-      'token' => hash_hmac('sha256', $this->token, $this->secret),
-      'expiry' => $this->lifeTime +  time()
-    ];
+    if (empty(Session::get('csrf'))) {
+      if (isset($_SESSION['csrf']) && is_array($_SESSION['csrf'])) {
+        // Ha már van csrf tömb a session-ben, akkor adjuk hozzá a generált tokent
+        $_SESSION['csrf'][] =  [
+          'token' => $encodedToken,
+          'expiry' => time() + $this->lifeTime
+        ];
+      } else {
+        // Ha még nincs csrf tömb a session-ben, akkor hozzunk létre újat és tegyük bele a generált tokent
+        $_SESSION['csrf'] = [[
+          'token' => $encodedToken,
+          'expiry' => time() + $this->lifeTime
+        ]];
+      }
+    }
+
 
     return $this;
   }
@@ -36,41 +50,37 @@ class CSRF
       session_start();
     }
 
+    $post_csrf = $this->request->key('csrf');
+    $session_csrf_arr = Session::get('csrf');
 
-    if (!isset($_POST['csrf'])) {
-      header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request');
-      header('X-E-Message:  Problem in CSRF Token POST');
-      abort(403);
-      exit;
-    }
-    
-    if (!Session::get('csrf')) {
-      header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request');
-      header('X-E-Message: SESSION problem in CSRF Token');
-      dd('hello');
-      abort(403);
 
+
+    if (!isset($post_csrf)) {
+      abort(419);
       exit;
     }
 
-    if ($_SESSION['csrf']['expiry'] < time()) {
-      header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request');
-      header('X-E-Message: CSRF token expired');
-      abort(403);
+    if (!$session_csrf_arr) {
+      abort(419);
       exit;
     }
-
-
-
-    $token = hash_hmac('sha256', $_POST['csrf'], $this->secret);
-
-    if (!hash_equals(Session::get('csrf')['token'], $token)) {
-      abort(403);
+    foreach ($session_csrf_arr  as $session_csrf) {
+      $token = hash_hmac('sha256', $_POST['csrf'], $this->secret);
+      if (hash_equals($session_csrf['token'], $token)) {
+        Session::unset('csrf');
+        break;
+      }
     }
 
     if (!$this->isSafeOrigin()) {
-      header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad Request');
-      header('X-E-Message: UNSAFE origin');
+      exit;
+    }
+
+    Session::unset('csrf');
+    return true;
+
+    if (!$this->isSafeOrigin()) {
+      abort(419);
       exit;
     }
 
@@ -80,18 +90,18 @@ class CSRF
 
   private function isSafeOrigin()
   {
-
-    $safeOrigins = ['http://localhost:8080', 'http://localhost:9090'];
+    $config = require base_path('config/auth.php');
+    $safe_origins = $config['csrf']['safe_origins'];
 
     // Ellenőrizzük az Origin fejlécet
     if (isset($_SERVER['HTTP_ORIGIN'])) {
       $origin = rtrim($_SERVER['HTTP_ORIGIN'], '/');
-      if (in_array($origin, $safeOrigins)) {
+      if (in_array($origin, $safe_origins)) {
         return true;
       }
     }
 
-    return false;
+    abort(419);
   }
 
 

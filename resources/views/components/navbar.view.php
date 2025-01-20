@@ -46,7 +46,6 @@
             </ul>
           </div>
 
-
         </div>
         <div class="btn-group dropend d-xl-none">
           <div class="dropdown">
