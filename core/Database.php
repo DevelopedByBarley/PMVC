@@ -94,26 +94,64 @@ class Database
         return $this->query;
     }
 
-    public function paginate($itemsPerPage = 10, $currentPage = null)
+    public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = ['email'])
     {
         $currentPage = $currentPage ?? ($_GET['offset'] ?? 1);
-        $currentPage = max((int)$currentPage, 1);   
-
-        $countQuery = preg_replace('/SELECT .*? FROM/', 'SELECT COUNT(*) as total FROM', $this->query, 1);
+        $currentPage = max((int)$currentPage, 1);
+    
+        // Alapértelmezett keresési feltétel
+        $searchCondition = '';
+        $searchParams = [];
+    
+        // Ha a keresés string, alkalmazzuk az összes keresési oszlopra
+        if (is_string($search) && !empty($search_columns)) {
+            $searchParts = [];
+            foreach ($search_columns as $column) {
+                $searchParts[] = "$column LIKE :search";
+            }
+            $searchCondition = ' WHERE ' . implode(' OR ', $searchParts);
+            $searchParams[':search'] = "%$search%";
+        }
+    
+        // Ha tömb a keresés, vizsgáljuk meg a kulcsokat és értékeket
+        if (is_array($search) && !empty($search)) {
+            $searchParts = [];
+            foreach ($search as $key => $value) {
+                if (in_array($key, $search_columns) && !empty($value)) {
+                    $searchParts[] = "$key LIKE :$key";
+                    $searchParams[":$key"] = "%$value%";
+                }
+            }
+    
+            if (!empty($searchParts)) {
+                $searchCondition = ' WHERE ' . implode(' AND ', $searchParts);
+            }
+        }
+    
+        // Frissített lekérdezések a kereséshez
+        $countQuery = preg_replace('/SELECT .*? FROM/', 'SELECT COUNT(*) as total FROM', $this->query, 1) . $searchCondition;
+        $paginatedQuery = $this->query . $searchCondition . " LIMIT :limit OFFSET :offset";
+    
+        // Összes rekord lekérdezése
         $countStmt = $this->connection->prepare($countQuery);
+        foreach ($searchParams as $param => $value) {
+            $countStmt->bindValue($param, $value, PDO::PARAM_STR);
+        }
         $countStmt->execute();
         $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
-
+    
         $totalPages = (int)ceil($totalRecords / $itemsPerPage);
         $offset = ($currentPage - 1) * $itemsPerPage;
-
-        // Limit hozzáadása a lekérdezéshez
-        $paginatedQuery = $this->query . " LIMIT :limit OFFSET :offset";
+    
+        // Adatok lekérdezése
         $this->statement = $this->connection->prepare($paginatedQuery);
+        foreach ($searchParams as $param => $value) {
+            $this->statement->bindValue($param, $value, PDO::PARAM_STR);
+        }
         $this->statement->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
         $this->statement->bindValue(':offset', $offset, PDO::PARAM_INT);
         $this->statement->execute();
-
+    
         return [
             'data' => $this->statement->fetchAll(PDO::FETCH_ASSOC),
             'total_records' => $totalRecords,
@@ -122,4 +160,6 @@ class Database
             'items_per_page' => $itemsPerPage,
         ];
     }
+    
+    
 }
