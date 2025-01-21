@@ -70,7 +70,7 @@ class Router
                     Middleware::resolve($route['middleware']);
                 }
 
-                if (is_callable($route['controller'])) {
+                if (!is_array($route['controller']) && is_callable($route['controller'])) {
                     echo call_user_func_array($route['controller'], $matches);
                     exit();
                 }

@@ -20,7 +20,7 @@
 
   
   <script type="module" src="/resources/js/main.js"></script>
-  <script src="resources/bootstrap/js/bootstrap.bundle.js?v=<?= time() ?>"></script>
+  <script src="/resources/bootstrap/js/bootstrap.bundle.js?v=<?= time() ?>"></script>
 </body>
 
 </html>
