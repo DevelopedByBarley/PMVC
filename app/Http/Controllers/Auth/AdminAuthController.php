@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Core\Navigator;
-use Core\Paginator;
 use Core\Session;
 use Core\ValidationException;
 
@@ -21,8 +20,6 @@ class AdminAuthController extends Controller
 
   public function index()
   {
-    $paginated = (new Paginator)->paginate($this->model->all('users'), $_GET['search'] ?? [], ['email', 'phone']);
-    dd($paginated);
     echo view('components/admin-layout', [
       'root' => view('admin/index', [
         "paginated" => []

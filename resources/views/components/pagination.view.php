@@ -1,9 +1,9 @@
 <?php
-//dd($paginated['total_pages']);
-$currentPage = $_GET['offset'] ?? 1; // az aktuális oldalszám
+if(!isset($paginated['total_pages'])) return;
+$currentPage = $_GET['offset'] ?? 1;
 
 $totalPages = (int)$paginated['total_pages']; // összes oldalszám
-$searchParameter = isset($_GET['date']) ? '?date=' . $_GET['date'] : '';
+$searchParameter = isset($_GET['search']) ? '?search=' . $_GET['search'] : '';
 
 ?>
 

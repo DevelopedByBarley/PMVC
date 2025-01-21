@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\UserAuthController;
 // Base Routes
 $router->view('/',  function () {
   session_start();
+
   echo view('components/layout', [
     'root' => view('welcome')
   ]);
