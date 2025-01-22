@@ -1,8 +1,6 @@
 <?php
-  return [
-    'test' => 'test',
-    'nested' => [
-      'test' => 'Angol beágyazott  '
-    ]
-  ]
-?>
+return [
+  'header' => [
+    'welcome' => "Welcome"
+  ],
+];
