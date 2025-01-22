@@ -54,10 +54,8 @@ class UserAuthController extends Controller
   public function loginPage()
   {
     session_start();
-    $paginated = $this->model->all('users', true);    
     echo view('components/layout', [
       'root' => view('auth/store', [
-        "paginated" => $paginated,
         "errors" => Session::get('errors') ?? []
       ])
     ]);
