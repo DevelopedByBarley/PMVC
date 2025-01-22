@@ -12,17 +12,26 @@
         <li class="nav-item">
           <a class="nav-link btn-dark " href="/admin">Admin</a>
         </li>
-      <!--   <li class="nav-item dropdown">
+        <li class="nav-item dropdown">
           <a class="nav-link btn-dark dropdown-toggle " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            
+            Lang
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li>
-              <a href="/lang/hu" class="dropdown-item">hu</a>
+              <form action="/lang" method="POST" class="d-inline">
+                <input type="hidden" name="lang" value="hu-Hu">
+                <button type="submit" class="dropdown-item">Hu</button>
+              </form>
             </li>
-            <li><a href="/lang/en" class="dropdown-item">en</a></li>
+            <li>
+              <form action="/lang" method="POST" class="d-inline">
+                <input type="hidden" name="lang" value="en-En">
+                <button type="submit" class="dropdown-item">En</button>
+              </form>
+            </li>
           </ul>
-        </li> -->
+
+        </li>
         <li class="nav-item">
           <a class="nav-link btn-dark disabled " href="#" tabindex="-1" aria-disabled="true">Disabled</a>
         </li>

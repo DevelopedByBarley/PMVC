@@ -2,23 +2,18 @@
   namespace Core;
 
   class Request {
-    protected $request;
 
-   public function __construct()
-   {
-    $this->request = $_POST;
-   }
 
-    public function all() {
+    public static function all() {
       return $_POST;
     }
 
-    public function key($key){
-      return $this->request[$key];
+    public static function key($key){
+      return $_POST[$key];
     }
 
-    public function validate($rules) {
-      return Validator::validate($this->request, $rules);
+    public static function validate($rules) {
+      return Validator::validate($_POST, $rules);
     }
   }
 ?>

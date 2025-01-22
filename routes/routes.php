@@ -4,21 +4,22 @@
 
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Auth\UserAuthController;
+use Core\Language;
+use Core\Navigator;
+use Core\Request;
 
 // Base Routes
-$router->view('/',  function () {
-  session_start();
-
+$router->view('/',  function () { Language::set();
   echo view('components/layout', [
     'root' => view('welcome')
   ]);
 });
 
-$router->get('/test/{id}', function ($id) {
-  echo view('components/layout', [
-    'root' => view('welcome', ["id" => $id])
-  ]);
+$router->post('/lang', function() {
+  Language::switch(Request::key('lang'));
+  Navigator::redirectBack();
 });
+
 
 
 // Admin Auth Routes
