@@ -62,7 +62,6 @@ class Router
             $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '([^/]+)', $route['uri']);
             $pattern = "#^" . $pattern . "$#";
 
-
             if (preg_match($pattern, $uri, $matches) && $route['method'] === strtoupper($method)) {
                 array_shift($matches); // Az első elem az egész találat
                 // Middleware kezelése
@@ -93,14 +92,10 @@ class Router
                     }
                     exit();
                 }
-
-                // Ellenkező esetben egyszerűen betöltjük a fájlt
-                return require base_path($route['controller']);
             }
         }
 
-        // Ha nincs találat, 404-es hiba
-        $this->abort();
+        $this->abort(404);
     }
 
 

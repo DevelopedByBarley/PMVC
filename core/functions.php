@@ -1,5 +1,6 @@
 <?php
 
+use Core\Cookie;
 use Core\Session;
 
 function session($entity)
@@ -69,7 +70,8 @@ function mail_temp_path($path)
 }
 
 
-function paginate($paginated) {
+function paginate($paginated)
+{
   require view_path('components/pagination');
 }
 
@@ -114,7 +116,27 @@ function filter_sanitize($value)
   }
 }
 
-  function csrf()
-  {
-    (new \Core\CSRF)->generate()->input();
+function csrf()
+{
+  (new \Core\CSRF)->generate()->input();
+}
+
+function lang($params)
+{
+  $lang = explode('-', Cookie::get('lang'))[0];
+  $keys = explode('__', $params);
+
+  [$file_name, $keys_of_arr] = $keys;
+
+  $arr_key = explode('.', $keys_of_arr);
+  $file = require base_path("langs/{$lang}/{$file_name}.lang.php");
+
+  foreach ($arr_key as $key) {
+    if (isset($file[$key])) {
+      $file = $file[$key]; // Frissítjük a referencia helyét
+    } else {
+      return "Translation for '{$keys_of_arr}' not found."; // Ha nem találjuk, hibát dobunk
+    }
   }
+  echo $file;
+}

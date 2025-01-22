@@ -15,6 +15,7 @@ $router->view('/',  function () { Language::set();
   ]);
 });
 
+
 $router->post('/lang', function() {
   Language::switch(Request::key('lang'));
   Navigator::redirectBack();
