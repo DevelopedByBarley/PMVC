@@ -47,11 +47,30 @@ function base_path($path)
   return BASE_PATH . $path;
 }
 
-function view($path, $attributes = [])
+function view($path, $params = [])
 {
-  extract($attributes);
+  ob_start();
 
-  require base_path('resources/views/' . $path . '.view.php');
+  extract($params);
+
+  $filePath = base_path('resources/views/' . $path . '.view.php');
+
+  if (!file_exists($filePath)) {
+    echo 'This file is doesnt exist!';
+    throw new \Exception("View file not found: " . $filePath);
+  }
+
+  require $filePath;
+
+
+
+  $output = ob_get_clean();
+
+  if (!headers_sent()) {
+    header("Content-Type: text/html; charset=UTF-8");
+  }
+
+  return $output;
 }
 
 function old($key, $default = '')
@@ -138,5 +157,15 @@ function lang($params)
       return "Translation for '{$keys_of_arr}' not found."; // Ha nem találjuk, hibát dobunk
     }
   }
-  echo $file;
+  return $file;
+}
+
+function cookie($key)
+{
+  return Cookie::get($key);
+}
+
+function public_file($path)
+{
+  return "/public/{$path}";
 }

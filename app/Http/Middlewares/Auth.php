@@ -3,6 +3,7 @@
 namespace App\Http\Middlewares;
 
 use Core\Database;
+use Core\Session;
 
 class Auth
 {
@@ -15,7 +16,7 @@ class Auth
 
     public function handle()
     {
-        session_start();
+        Session::create();
         if (!isset($_SESSION['user']) || !$_SESSION['user']) {
             return header('Location: /login');
             exit();

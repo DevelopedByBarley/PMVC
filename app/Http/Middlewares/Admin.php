@@ -3,6 +3,7 @@
 namespace App\Http\Middlewares;
 
 use Core\Database;
+use Core\Session;
 
 class Admin
 {
@@ -15,7 +16,7 @@ class Admin
 
 	public function handle()
 	{
-		session_start();
+		Session::create();
 		if (!isset($_SESSION['admin']) || !$_SESSION['admin']) {
 			return header('Location: /admin');
 			exit();

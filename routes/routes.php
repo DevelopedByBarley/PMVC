@@ -8,14 +8,7 @@ use Core\Language;
 use Core\Navigator;
 use Core\Request;
 
-// Base Routes
-$router->view('/',  function () { Language::set();
-  echo view('components/layout', [
-    'root' => view('welcome')
-  ]);
-});
-
-
+$router->view('/', 'components/layout', 'welcome');
 $router->post('/lang', function() {
   Language::switch(Request::key('lang'));
   Navigator::redirectBack();

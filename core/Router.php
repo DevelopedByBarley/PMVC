@@ -46,9 +46,14 @@ class Router
         return   $this->add('PUT', $uri, $controller);
     }
 
-    public function view($uri, $callback)
+    public function view($uri, string $layout, string $root, array $params = [])
     {
-        return $this->add('GET', $uri, $callback);
+        return $this->add('GET', $uri, function () use ($layout, $root, $params) {
+            echo view($layout, [
+                'root' => view($root, $params)
+            ]);
+            return;
+        });
     }
 
     public function route($uri, $method)
@@ -83,6 +88,7 @@ class Router
 
                     if (in_array(strtoupper($method), $csrfProtectedMethods) && $csrf_config['csrf']['protect']) {
                         (new CSRF)->check();
+                        Request::unset('csrf');
                     }
 
                     try {

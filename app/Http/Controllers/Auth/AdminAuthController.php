@@ -28,7 +28,7 @@ class AdminAuthController extends Controller
   }
   public function create()
   {
-    session_start();
+    Session::create();
     if (Session::get('admin')) {
       return Navigator::redirect('/admin/dashboard');
     }
@@ -42,7 +42,7 @@ class AdminAuthController extends Controller
 
   public function store()
   {
-    session_start();
+    Session::create();
 
 
     try {

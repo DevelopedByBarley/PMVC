@@ -12,9 +12,9 @@ class Cookie
      * @param int    $expiry Expiry time in seconds (default: 1 hour).
      * @return void
      */
-    public static function set(string $key, string $value, int $expiry = 3600): void
+    public static function set(string $key, string $value, int $expiry = 3600, bool $onlyHttp = false): void
     {
-        setcookie($key, $value, time() + $expiry, "/", "", false, true);
+        setcookie($key, $value, time() + $expiry, "/", "", false, $onlyHttp);
     }
 
     /**
@@ -62,5 +62,3 @@ class Cookie
         return hash('sha256', uniqid((string) mt_rand(), true));
     }
 }
-
-?>

@@ -20,6 +20,7 @@ class CSRF
 
   public function generate()
   {
+    Session::create();
     $this->token = bin2hex(random_bytes(32));
     $encodedToken = hash_hmac('sha256',  $this->token, $this->secret);
 
@@ -40,9 +41,7 @@ class CSRF
 
   public function check()
   {
-    if (session_status() === PHP_SESSION_NONE) {
-      session_start();
-    }
+    Session::create();
 
     $post_csrf = $this->request->key('csrf');
     $session_csrf_arr = Session::get('csrf');

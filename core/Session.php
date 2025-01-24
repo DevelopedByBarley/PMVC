@@ -4,6 +4,15 @@ namespace Core;
 
 class Session
 {
+
+  public static function create()
+  {
+    if (session_status() === PHP_SESSION_NONE) {
+      session_start();
+    }
+  }
+
+
   public function has($key)
   {
     return (bool)static::get($key);

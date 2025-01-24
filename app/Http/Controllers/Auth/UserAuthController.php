@@ -39,7 +39,7 @@ class UserAuthController extends Controller
 
   public function create()
   {
-    session_start();
+    Session::create();
     if (Session::get('user')) {
       return Navigator::redirect('/dashboard');
     }
@@ -53,7 +53,7 @@ class UserAuthController extends Controller
 
   public function loginPage()
   {
-    session_start();
+    Session::create();
     echo view('components/layout', [
       'root' => view('auth/store', [
         "errors" => Session::get('errors') ?? []
@@ -64,7 +64,7 @@ class UserAuthController extends Controller
 
   public function login()
   {
-    session_start();
+    Session::create();
 
     try {
       $validated = $this->request->validate([
