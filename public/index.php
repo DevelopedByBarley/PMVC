@@ -1,6 +1,7 @@
 <?php
 
 use Core\Database;
+use Core\Language;
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -21,6 +22,7 @@ require base_path('playground.php');
 
 
 $db = Database::getInstance();
+(new Language)->set();
 
 $router = new \Core\Router();
 $routes = require base_path('routes/routes.php');
