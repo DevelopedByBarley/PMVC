@@ -27,7 +27,7 @@ class Database
             ]);
         } catch (PDOException $e) {
             Log::critical('Database connection fail!', 'Fail in Database class construct function with message:' . $e->getMessage());
-            dd($e);
+            dd($e->getMessage());
         }
     }
 
@@ -91,7 +91,7 @@ class Database
             return $this;
         } catch (PDOException $e) {
             Log::critical('Database fail in execute method', 'Fail in Database class execute function with message:' . $e->getMessage());
-            dd($e);
+            dd($e->getMessage());
         }
     }
 
@@ -111,7 +111,7 @@ class Database
             return $this;
         } catch (PDOException $e) {
             Log::critical('Database fail in query method', 'Fail in Database class query function with message:' . $e->getMessage());
-            dd($e);
+            dd($e->getMessage());
         }
     }
 
@@ -213,7 +213,7 @@ class Database
             ];
         } catch (PDOException $e) {
             Log::critical('Database fail in paginate method', 'Query: ' . $this->query . ' Error: ' . $e->getMessage());
-            dd($e);
+            dd($e->getMessage());
         }
     }
 }

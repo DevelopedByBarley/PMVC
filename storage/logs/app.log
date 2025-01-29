@@ -1,32 +1,4 @@
-[2025-01-29 18:16:41] ERROR: Database fail in query method
+[2025-01-29 18:34:11] CRITICAL: Database fail in query method
 [DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:17:46] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:17:46] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:17:47] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:18:07] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:18:08] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:18:16] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:18:23] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:18:26] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:18:43] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:19:01] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:19:21] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:19:35] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:19:36] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:20:07] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:20:07] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:35:19] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S22]: Column not found: 1054 Unknown column 'phone' in 'field list'
