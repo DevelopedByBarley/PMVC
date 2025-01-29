@@ -31,26 +31,41 @@ class Database
         }
     }
 
-
     /**
-     * Sets the SQL query and returns the current instance.
+     * Sets the SQL query and returns the current instance for method chaining.
      *
      * @param string $query The SQL query string.
      * @return self The current instance for method chaining.
      */
-
     public function prepare($query)
     {
         $this->query = $query;
         return $this;
     }
 
-    public function leftJoin($table, $firstColumn, $operator, $secondColumn)
+    /**
+     * Adds a LEFT JOIN clause to the current SQL query and returns the current instance for method chaining.
+     *
+     * @param string $table The table to join.
+     * @param string $first_column The first column for the join condition.
+     * @param string $operator The operator used in the join condition.
+     * @param string $second_column The second column for the join condition.
+     * @return self The current instance for method chaining.
+     */
+    public function leftJoin($table, $first_column, $operator, $second_column)
     {
-        $this->query .= " LEFT JOIN $table ON $firstColumn $operator $secondColumn";
+        $this->query .= " LEFT JOIN $table ON $first_column $operator $second_column";
         return $this;
     }
 
+    /**
+     * Adds a WHERE clause to the current SQL query and returns the current instance for method chaining.
+     *
+     * @param string $column The column to apply the condition on.
+     * @param string $operator The operator to compare the column value.
+     * @param mixed $value The value to compare the column against.
+     * @return self The current instance for method chaining.
+     */
     public function where($column, $operator, $value)
     {
         if (stripos($this->query, 'WHERE') === false) {
@@ -62,7 +77,12 @@ class Database
         return $this;
     }
 
-
+    /**
+     * Executes the current SQL query with the provided parameters.
+     *
+     * @param array $params The parameters to bind to the query.
+     * @return self The current instance for method chaining.
+     */
     public function execute($params = [])
     {
         try {
@@ -76,14 +96,13 @@ class Database
     }
 
     /**
-     * Executes a database query with the given parameters.
+     * Executes a custom SQL query with the provided parameters.
      *
-     * @param string $query The SQL query string to be executed.
+     * @param string $query The SQL query string to execute.
      * @param array $params The parameters to bind to the query (optional).
      * @return self The current instance for method chaining.
-     * @throws DatabaseException If there is a database error during query execution.
+     * @throws DatabaseException If a database error occurs.
      */
-
     public function query($query, $params = [])
     {
         try {
@@ -96,32 +115,65 @@ class Database
         }
     }
 
+    /**
+     * Fetches all results from the executed query.
+     *
+     * @param int $ret_type The fetch mode (default is PDO::FETCH_OBJ).
+     * @return array The fetched results.
+     */
     public function get($ret_type = PDO::FETCH_OBJ)
     {
         return $this->statement->fetchAll($ret_type);
     }
 
+    /**
+     * Fetches the first result from the executed query.
+     *
+     * @param int $ret_type The fetch mode (default is PDO::FETCH_OBJ).
+     * @return mixed The fetched result.
+     */
     public function find($ret_type = PDO::FETCH_OBJ)
     {
         return $this->statement->fetch($ret_type);
     }
 
+    /**
+     * Fetches the first result or throws an error if no result is found.
+     *
+     * @param int $ret_type The fetch mode (default is PDO::FETCH_OBJ).
+     * @return mixed The fetched result.
+     * @throws DatabaseException If no result is found.
+     */
     public function findOrFail($ret_type = PDO::FETCH_OBJ)
     {
         $result = $this->find($ret_type);
 
-        if (! $result) {
+        if (!$result) {
             abort();
         }
 
         return $result;
     }
 
+    /**
+     * Returns the current SQL query as a string for debugging.
+     *
+     * @return string The current SQL query.
+     */
     public function debug()
     {
         return $this->query;
     }
 
+    /**
+     * Paginates the results of the current query.
+     *
+     * @param int $itemsPerPage The number of items per page (default is 10).
+     * @param int|null $currentPage The current page (defaults to $_GET['offset'] or 1).
+     * @param array $search An array of search parameters (optional).
+     * @param array $search_columns The columns to search by (default is ['email']).
+     * @return array The paginated results.
+     */
     public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = ['email'])
     {
         try {
@@ -130,7 +182,6 @@ class Database
 
             $searchCondition = '';
             $searchParams = [];
-
 
             $countQuery = preg_replace('/SELECT .*? FROM/', 'SELECT COUNT(*) as total FROM', $this->query, 1) . $searchCondition;
             $paginatedQuery = $this->query . $searchCondition . " LIMIT :limit OFFSET :offset";
