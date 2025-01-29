@@ -12,12 +12,12 @@ class Database
     public $connection;
     public $statement;
     private $query = '';
-    private $toast;
+    private $redirected = false;
 
     public function __construct()
     {
         $config = require base_path('config/database.php');
-        $this->toast = new Toast();
+
 
         try {
             $dsn = 'mysql:host=' . $config['host'] . ';port=' . $config['port'] . ';dbname=' . $config['db_name'] . ';charset=' . $config['charset'];
@@ -26,7 +26,7 @@ class Database
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ]);
         } catch (PDOException $e) {
-            Log::error('Database connection fail!', 'Fail in Database class construct function with message:' . $e->getMessage());
+            Log::critical('Database connection fail!', 'Fail in Database class construct function with message:' . $e->getMessage());
             dd($e);
         }
     }
@@ -90,8 +90,8 @@ class Database
             $this->statement->execute($params);
             return $this;
         } catch (PDOException $e) {
-            Log::error('Database fail in execute method', 'Fail in Database class execute function with message:' . $e->getMessage());
-            $this->toast->danger('Általános rendszer hiba')->back();
+            Log::critical('Database fail in execute method', 'Fail in Database class execute function with message:' . $e->getMessage());
+            dd($e);
         }
     }
 
@@ -110,8 +110,8 @@ class Database
             $this->statement->execute($params);
             return $this;
         } catch (PDOException $e) {
-            Log::error('Database fail in query method', 'Fail in Database class query function with message:' . $e->getMessage());
-            $this->toast->danger('Általános rendszer hiba')->back();
+            Log::critical('Database fail in query method', 'Fail in Database class query function with message:' . $e->getMessage());
+            dd($e);
         }
     }
 
@@ -212,8 +212,8 @@ class Database
                 'items_per_page' => $itemsPerPage,
             ];
         } catch (PDOException $e) {
-            Log::error('Database fail in paginate method', 'Query: ' . $this->query . ' Error: ' . $e->getMessage());
-            $this->toast->danger('Általános rendszer hiba')->back();
+            Log::critical('Database fail in paginate method', 'Query: ' . $this->query . ' Error: ' . $e->getMessage());
+            dd($e);
         }
     }
 }

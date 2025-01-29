@@ -1,18 +1,32 @@
-[2025-01-29 17:37:38] INFO: message
-[DEV] dev_message
-[2025-01-29 17:41:19] INFO: message
-[DEV] dev_message
-[2025-01-29 17:42:32] INFO: This is a test
-[2025-01-29 17:43:14] INFO: This is a test
-[2025-01-29 17:43:17] INFO: This is a test
-[2025-01-29 17:45:19] INFO: This is a test
-[32m[2025-01-29 17:47:27] INFO: This is a test[0m
-[35m[2025-01-29 17:48:00] CRITICAL: This is a test[0m
-[32m[2025-01-29 17:48:14] INFO: This is a test[0m
-[33m[2025-01-29 17:48:21] WARNING: This is a test[0m
-[33m[2025-01-29 17:48:23] WARNING: This is a test[0m
-[33m[2025-01-29 17:48:24] WARNING: This is a test[0m
-[2025-01-29 17:48:35] WARNING: This is a test
-[2025-01-29 17:48:57] ERROR: This is a test
-[2025-01-29 17:49:08] INFO: This is a test
-[2025-01-29 17:49:08] INFO: This is a test
+[2025-01-29 18:16:41] ERROR: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:17:46] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:17:46] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:17:47] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:18:07] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:18:08] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:18:16] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:18:23] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:18:26] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:18:43] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:19:01] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:19:21] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:19:35] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:19:36] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:20:07] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
+[2025-01-29 18:20:07] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
