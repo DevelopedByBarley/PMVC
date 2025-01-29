@@ -4,22 +4,20 @@ namespace Core;
 
 class Navigator
 {
-  public static function redirect($uri = null)
+  public static function redirect($url)
   {
-    if ($uri) {
-      header('Location: ' . $uri);
-      exit; // Biztosítja, hogy a szkript futása leálljon
-    }
-
-    throw new \InvalidArgumentException('No URI provided for redirection.');
+    header("HTTP/1.1 302 Found");
+    header("Location: " . $url);
+    exit;
   }
 
   public static function redirectBack()
   {
-    if (!empty($_SERVER['HTTP_REFERER'])) {
-      static::redirect($_SERVER['HTTP_REFERER']);
+    if (!empty($_SERVER['HTTP_REFERER']) && filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL)) {
+      header("Location: " . $_SERVER['HTTP_REFERER']);
+      exit; 
     } else {
-      throw new \RuntimeException('HTTP_REFERER is not set, cannot redirect back.');
+      static::redirect('/default-page');
     }
   }
 }

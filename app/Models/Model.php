@@ -20,11 +20,11 @@ class Model
   }
 
 
-  public function all($table, $withPaginate = false)
+  public function all($table, $withPaginate = false, $search = '' || [], $search_columns = [])
   {
-    return !$withPaginate ? $this->db->query("SELECT * FROM $table")->get() :  $this->db->prepare("SELECT * FROM $table")->paginate();
+    return !$withPaginate ? $this->db->query("SELECT * FROM $table")->get() :  $this->db->prepare("SELECT * FROM $table")->paginate(25, null, $search, $search_columns);
   }
-
+  
   public function findAll($table, $id)
   {
     return $this->db->query("SELECT * FROM $table WHERE id = :id", ['id' => $id])->get();

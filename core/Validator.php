@@ -2,15 +2,8 @@
 
 namespace Core;
 
-use Illuminate\Support\Collection;
+use Exception;
 
-/* 
-    What i want ?
-
-    $request()->validators([
-      "name" => ['string', 'required', 'min:5', 'max:5', 'uniq:email:users']
-    ])
-  */
 
 class Validator
 {
@@ -34,6 +27,7 @@ class Validator
     $rules = static::structure($rules);
 
     foreach ($request as $req_key => $req_value) {
+      $req_value =  filter_sanitize($req_value);
       $validator = $rules[$req_key] ?? [];
       foreach ($validator as  $val_value) {
         if (strpos($val_value, ':')) {
@@ -60,10 +54,6 @@ class Validator
     if (!empty($errors)) return ValidationException::throw($errors, $request);
 
     return $request;
-  }
-  
-  public function throw($errors) {
-
   }
 
   public static function errors($ret)
@@ -98,12 +88,86 @@ class Validator
     return (int)strlen($value) <= $length;
   }
 
-  protected static function password($value) {}
-
-  protected static function unique($req_value, $val_value)
+  public static function password($value)
   {
+    $hasUpperCase = preg_match('/[A-Z]/', $value);
+    $hasLowerCase = preg_match('/[a-z]/', $value);
+    $hasNumber = preg_match('/\d/', $value);
+    $hasSpecialChar = preg_match('/[!@#$%^&*(),.?":{}|<>]/', $value);
+    $isLengthValid = strlen($value) >= 8;
+
+    return $hasUpperCase && $hasLowerCase && $hasNumber && $hasSpecialChar && $isLengthValid;
+  }
+
+  public static function comparePw($password, $confirmPassword)
+  {
+    return $password === $confirmPassword;
+  }
+
+  public static function unique($value, $params)
+  {
+    $paramsArray = explode('|', $params);
+
+    if (count($paramsArray) < 2) {
+      throw new Exception("Hibás bemenet: a paraméterek nem megfelelőek.");
+    }
+
+    $db = trim($paramsArray[1]); // Táblanév
+    $record = trim($paramsArray[0]); // Oszlopnév
+
+    $sql = "SELECT COUNT(*) as count FROM `$db` WHERE `$record` = :value";
+
+    $result = (new Database)->query($sql, ["value" => $value])->get()[0];
+
+    return (int)$result->count === 0;
+  }
+  
+  
+  public static function phone($value)
+  {
+    $cleanValue = preg_replace('/[\s\-]/', '', $value);
+    $pattern = '/^(?:\+36|06)\d{9}$/';
+
+    return preg_match($pattern, $cleanValue);
+  }
+
+  public static function email($value)
+  {
+    return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+  }
+
+  public static function noSpaces($value)
+  {
+    if (strpos($value, ' ') !== false) return false;
     return true;
   }
+
+  public static function num($value)
+  {
+    if (!is_numeric($value)) return false;
+    return true;
+  }
+
+
+  public static function hasNum($value)
+  {
+    return preg_match('/\d/', $value);
+  }
+
+  public static function hasUppercase($value)
+  {
+    return preg_match('/[A-Z]/', $value);
+  }
+
+  public static function split($value)
+  {
+    $words = explode(' ', trim($value));
+    return count($words) >= 2 && strlen($words[1]) > 0;
+  }
+
+
+
+
 
 
   private static function errorMessages($validator, $param = '')
@@ -126,6 +190,14 @@ class Validator
         'hu' => "A mező nem lehet hosszabb, mint {$param} karakter.",
         'en' => "The field cannot be longer than {$param} characters.",
       ],
+      'email' => [
+        'hu' => "Kérjük adjon meg igazi email címet.",
+        'en' => "Please enter a valid email address.",
+      ],
+      'unique' => [
+        'hu' => "Ezekkel az adatokkal már nem lehet regisztrálni, kérjük próbálja meg más adatokkal..",
+        'en' => "You can not register with that datas, please try again.",
+      ]
     ];
 
     return $messages[$validator][$lang];
