@@ -15,7 +15,7 @@ namespace Core;
 class Storage
 {
   private array $whiteList;
-  public array $files;
+  public array | null $files = null;
   public $file;
 
 
@@ -31,6 +31,9 @@ class Storage
   // Add single file for uplodat,
   public function file($file)
   {
+    if (empty($file['name'][0])) {
+      return $this;
+    }
     $this->file = $file;
     $this->checkMimeType($this->file);
     return $this;
@@ -52,6 +55,9 @@ class Storage
   // Add multiple files in array;
   public function files($files)
   {
+    if (empty($files['name'][0])) {
+      return $this;
+    }
     $this->files = $this->formatFilesForSave($files);
     $this->checkMimeTypeByArray($this->files);
     return $this;
@@ -61,15 +67,23 @@ class Storage
   {
     if (!empty($arr_of_images)) {
       foreach ($arr_of_images as $image) {
-        unlink(base_path('resources/images' . $path . "" . $image));
+        $imagePath = base_path('public/images' . $path . "/" . $image);
+
+        if (file_exists($imagePath)) {
+          unlink($imagePath);  
+        }
       }
     }
+
     return $this;
   }
 
 
-  public function save($path)
+  public function save($path = "/")
   {
+    if ((!$this->file || is_null($this->file)) && (!$this->files || is_null($this->files))) {
+      return null;
+    }
     if (!empty($this->files)) {
       foreach ($this->files as $file) {
         $this->saveFile($file, $path);
@@ -84,7 +98,7 @@ class Storage
     $rand = uniqid(rand(), true);
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
     $originalFileName = $rand . '.' . $ext;
-    $directoryPath = base_path('resources/images' . $path);
+    $directoryPath = base_path('public/images' . $path);
 
     if (!is_dir($directoryPath)) {
       mkdir($directoryPath, 0755, true);
@@ -100,7 +114,8 @@ class Storage
     $fileType = mime_content_type($file["tmp_name"]);
 
     if (!in_array($fileType, $this->whiteList)) {
-      throw new \Exception("File type not allowed: " . $fileType);
+      Log::info('File mimetype is not allowed');
+      (new Toast)->danger('Hibás fájl formátum, kérjük próbálja meg újra.')->back();
     }
   }
 

@@ -13,6 +13,7 @@
 <body>
   
   <?php require_once view_path('components/navbar') ?>
+  <?php require_once view_path('components/toast') ?>
   
   <?= $root ?>
   

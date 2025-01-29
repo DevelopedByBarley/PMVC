@@ -1,4 +1,1 @@
-[2025-01-29 18:34:11] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.dd' doesn't exist
-[2025-01-29 18:35:19] CRITICAL: Database fail in query method
-[DEV] Fail in Database class query function with message:SQLSTATE[42S22]: Column not found: 1054 Unknown column 'phone' in 'field list'
+[2025-01-29 19:31:33] INFO: File mimetype is not allowed

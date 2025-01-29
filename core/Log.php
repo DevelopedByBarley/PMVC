@@ -32,8 +32,10 @@ class Log
   {
     self::log('WARNING', $logFile, $message, $dev);
   }
+
   public static function critical($message, $dev = null, $logFile = 'app')
   {
     self::log('CRITICAL', $logFile, $message, $dev);
+    dd('');
   }
 }

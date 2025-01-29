@@ -7,6 +7,7 @@ use Core\Authenticator;
 use Core\CSRF;
 use Core\Mailer;
 use Core\Request;
+use Core\Storage;
 use Core\Toast;
 
 class Controller
@@ -16,6 +17,7 @@ class Controller
   protected $auth;
   protected $request;
   protected $mailer;
+  protected $storage;
   protected $csrf;
   
   public function __construct()
@@ -25,6 +27,7 @@ class Controller
     $this->request = new Request();
     $this->auth = new Authenticator();
     $this->mailer = new Mailer();
+    $this->storage = new Storage();
     $this->csrf = new CSRF();
   }
 

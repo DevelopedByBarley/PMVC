@@ -40,6 +40,7 @@ class UserAuthController extends Controller
   public function create()
   {
     Session::create();
+   
     if (Session::get('user')) {
       return Navigator::redirect('/dashboard');
     }
@@ -92,10 +93,7 @@ class UserAuthController extends Controller
 
   public function store()
   {
-    //dd($_FILES['file']);
-
-
-
+    (new Storage())->files($_FILES['file'])->deletePrevImages('/', ['1992607091679a707a21ff06.02347278  .jpg'])->save();
     $faker = Faker::create();
     try {
       $validated = $this->request->validate([
