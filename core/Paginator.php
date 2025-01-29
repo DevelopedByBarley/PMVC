@@ -36,17 +36,16 @@ class Paginator
 		return $this;
 	}
 
-	public function paginate()
+	public function paginate($itemsPerPage = 25)
 	{
 
-		$itemsPerPage = 5;
 		$currentPage = isset($_GET['offset']) ? (int)$_GET['offset'] : 1;
 		$totalRecords = count($this->data);
 		$totalPages = ceil($totalRecords / $itemsPerPage);
 		$startIndex = ($currentPage - 1) * $itemsPerPage;
 		$dataForPage = array_slice($this->data, $startIndex, $itemsPerPage);
 
-		return [
+		return (object)[
 			'data' => $dataForPage,
 			'total_records' => $totalRecords,
 			'total_pages' => $totalPages,

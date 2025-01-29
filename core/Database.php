@@ -174,7 +174,7 @@ class Database
      * @param array $search_columns The columns to search by (default is ['email']).
      * @return array The paginated results.
      */
-    public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = ['email'])
+    public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = [])
     {
         try {
             $currentPage = $currentPage ?? ($_GET['offset'] ?? 1);
@@ -204,8 +204,8 @@ class Database
             $this->statement->bindValue(':offset', $offset, PDO::PARAM_INT);
             $this->statement->execute();
 
-            return [
-                'data' => $this->statement->fetchAll(PDO::FETCH_ASSOC),
+            return (object)[
+                'data' => $this->statement->fetchAll(PDO::FETCH_OBJ),
                 'total_records' => $totalRecords,
                 'total_pages' => $totalPages,
                 'current_page' => $currentPage,

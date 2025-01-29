@@ -95,11 +95,6 @@ function paginate($paginated)
 }
 
 
-function can($entity) {}
-
-function cannot($entity) {}
-
-
 /**
  * Általános szűrő és szanitizáló függvény.
  *

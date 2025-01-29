@@ -1,8 +1,7 @@
 <?php
-if(!isset($paginated['total_pages'])) return;
+if (!isset($paginated->total_pages)) return;
 $currentPage = $_GET['offset'] ?? 1;
-
-$totalPages = (int)$paginated['total_pages']; // összes oldalszám
+$totalPages = (int)$paginated->total_pages; // összes oldalszám
 $searchParameter = isset($_GET['search']) ? '?search=' . $_GET['search'] : '';
 
 ?>
@@ -25,7 +24,7 @@ $searchParameter = isset($_GET['search']) ? '?search=' . $_GET['search'] : '';
       </a>
     </li>
     <form class="d-flex mx-2">
-      <input type="search" id="search" name="search" value="<?= $_GET['search'] ?? ''?>" class="form-control " />
+      <input type="search" id="search" name="search" value="<?= $_GET['search'] ?? '' ?>" class="form-control " />
       <button class="btn btn-primary">
         <i class="fas fa-search"></i>
       </button>
