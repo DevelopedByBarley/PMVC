@@ -3,6 +3,7 @@
 namespace Core;
 
 use PDO;
+use PDOException;
 
 class Database
 {
@@ -11,20 +12,33 @@ class Database
     public $connection;
     public $statement;
     private $query = '';
+    private $toast;
 
     public function __construct()
     {
         $config = require base_path('config/database.php');
+        $this->toast = new Toast();
 
-        $dsn = 'mysql:host=' . $config['host'] . ';port=' . $config['port'] . ';dbname=' . $config['db_name'] . ';charset=' . $config['charset'];
+        try {
+            $dsn = 'mysql:host=' . $config['host'] . ';port=' . $config['port'] . ';dbname=' . $config['db_name'] . ';charset=' . $config['charset'];
 
-        $this->connection = new PDO($dsn, $config['name'], $config['password'], [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]);
+            $this->connection = new PDO($dsn, $config['name'], $config['password'], [
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ]);
+        } catch (PDOException $e) {
+            Log::error('Database connection fail!', 'Fail in Database class construct function with message:' . $e->getMessage());
+            dd($e);
+        }
     }
 
 
-    // FOR JOIN --------
+    /**
+     * Sets the SQL query and returns the current instance.
+     *
+     * @param string $query The SQL query string.
+     * @return self The current instance for method chaining.
+     */
+
     public function prepare($query)
     {
         $this->query = $query;
@@ -48,24 +62,38 @@ class Database
         return $this;
     }
 
+
     public function execute($params = [])
     {
-        $this->statement = $this->connection->prepare($this->query);
-        $this->statement->execute($params);
-        return $this;
+        try {
+            $this->statement = $this->connection->prepare($this->query);
+            $this->statement->execute($params);
+            return $this;
+        } catch (PDOException $e) {
+            Log::error('Database fail in execute method', 'Fail in Database class execute function with message:' . $e->getMessage());
+            $this->toast->danger('Általános rendszer hiba')->back();
+        }
     }
 
-
-    // -----------------
-
+    /**
+     * Executes a database query with the given parameters.
+     *
+     * @param string $query The SQL query string to be executed.
+     * @param array $params The parameters to bind to the query (optional).
+     * @return self The current instance for method chaining.
+     * @throws DatabaseException If there is a database error during query execution.
+     */
 
     public function query($query, $params = [])
     {
-        $this->statement = $this->connection->prepare($query);
-
-        $this->statement->execute($params);
-
-        return $this;
+        try {
+            $this->statement = $this->connection->prepare($query);
+            $this->statement->execute($params);
+            return $this;
+        } catch (PDOException $e) {
+            Log::error('Database fail in query method', 'Fail in Database class query function with message:' . $e->getMessage());
+            $this->toast->danger('Általános rendszer hiba')->back();
+        }
     }
 
     public function get($ret_type = PDO::FETCH_OBJ)
@@ -96,70 +124,45 @@ class Database
 
     public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = ['email'])
     {
-        $currentPage = $currentPage ?? ($_GET['offset'] ?? 1);
-        $currentPage = max((int)$currentPage, 1);
-    
-        // Alapértelmezett keresési feltétel
-        $searchCondition = '';
-        $searchParams = [];
-    
-        // Ha a keresés string, alkalmazzuk az összes keresési oszlopra
-        if (is_string($search) && !empty($search_columns)) {
-            $searchParts = [];
-            foreach ($search_columns as $column) {
-                $searchParts[] = "$column LIKE :search";
+        try {
+            $currentPage = $currentPage ?? ($_GET['offset'] ?? 1);
+            $currentPage = max((int)$currentPage, 1);
+
+            $searchCondition = '';
+            $searchParams = [];
+
+
+            $countQuery = preg_replace('/SELECT .*? FROM/', 'SELECT COUNT(*) as total FROM', $this->query, 1) . $searchCondition;
+            $paginatedQuery = $this->query . $searchCondition . " LIMIT :limit OFFSET :offset";
+
+            $countStmt = $this->connection->prepare($countQuery);
+            foreach ($searchParams as $param => $value) {
+                $countStmt->bindValue($param, $value, PDO::PARAM_STR);
             }
-            $searchCondition = ' WHERE ' . implode(' OR ', $searchParts);
-            $searchParams[':search'] = "%$search%";
-        }
-    
-        // Ha tömb a keresés, vizsgáljuk meg a kulcsokat és értékeket
-        if (is_array($search) && !empty($search)) {
-            $searchParts = [];
-            foreach ($search as $key => $value) {
-                if (in_array($key, $search_columns) && !empty($value)) {
-                    $searchParts[] = "$key LIKE :$key";
-                    $searchParams[":$key"] = "%$value%";
-                }
+            $countStmt->execute();
+            $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+            $totalPages = (int)ceil($totalRecords / $itemsPerPage);
+            $offset = ($currentPage - 1) * $itemsPerPage;
+
+            $this->statement = $this->connection->prepare($paginatedQuery);
+            foreach ($searchParams as $param => $value) {
+                $this->statement->bindValue($param, $value, PDO::PARAM_STR);
             }
-    
-            if (!empty($searchParts)) {
-                $searchCondition = ' WHERE ' . implode(' AND ', $searchParts);
-            }
+            $this->statement->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
+            $this->statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $this->statement->execute();
+
+            return [
+                'data' => $this->statement->fetchAll(PDO::FETCH_ASSOC),
+                'total_records' => $totalRecords,
+                'total_pages' => $totalPages,
+                'current_page' => $currentPage,
+                'items_per_page' => $itemsPerPage,
+            ];
+        } catch (PDOException $e) {
+            Log::error('Database fail in paginate method', 'Query: ' . $this->query . ' Error: ' . $e->getMessage());
+            $this->toast->danger('Általános rendszer hiba')->back();
         }
-    
-        // Frissített lekérdezések a kereséshez
-        $countQuery = preg_replace('/SELECT .*? FROM/', 'SELECT COUNT(*) as total FROM', $this->query, 1) . $searchCondition;
-        $paginatedQuery = $this->query . $searchCondition . " LIMIT :limit OFFSET :offset";
-    
-        // Összes rekord lekérdezése
-        $countStmt = $this->connection->prepare($countQuery);
-        foreach ($searchParams as $param => $value) {
-            $countStmt->bindValue($param, $value, PDO::PARAM_STR);
-        }
-        $countStmt->execute();
-        $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
-    
-        $totalPages = (int)ceil($totalRecords / $itemsPerPage);
-        $offset = ($currentPage - 1) * $itemsPerPage;
-    
-        // Adatok lekérdezése
-        $this->statement = $this->connection->prepare($paginatedQuery);
-        foreach ($searchParams as $param => $value) {
-            $this->statement->bindValue($param, $value, PDO::PARAM_STR);
-        }
-        $this->statement->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
-        $this->statement->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $this->statement->execute();
-    
-        return [
-            'data' => $this->statement->fetchAll(PDO::FETCH_ASSOC),
-            'total_records' => $totalRecords,
-            'total_pages' => $totalPages,
-            'current_page' => $currentPage,
-            'items_per_page' => $itemsPerPage,
-        ];
     }
-    
-    
 }
