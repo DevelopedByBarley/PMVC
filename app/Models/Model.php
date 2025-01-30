@@ -99,4 +99,6 @@ class Model
 
     return $this->db->query($query)->get(PDO::FETCH_ASSOC);
   }
+
+
 }
