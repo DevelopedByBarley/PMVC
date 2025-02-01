@@ -59,8 +59,8 @@ class AdminAuthController extends Controller
 
 
 
-    $email = filter_sanitize($validated['email']) ?? null;
-    $password = filter_sanitize($validated['password']) ?? null;
+    $email = sanitize($validated['email']) ?? null;
+    $password = sanitize($validated['password']) ?? null;
 
     $authenticated = $this->auth->attempt($email, $password, 'admins');
 

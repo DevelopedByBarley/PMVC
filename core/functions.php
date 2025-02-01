@@ -33,6 +33,11 @@ function urlIs($value)
   return $_SERVER['REQUEST_URI'] === $value;
 }
 
+function urlContains($needle)
+{
+    return strpos($_SERVER['REQUEST_URI'], $needle) !== false;
+}
+
 function abort($code = 404)
 {
   http_response_code($code);
@@ -108,7 +113,7 @@ function paginate($paginated)
  * @param mixed $value A bemenet, amit tisztítani szeretnél.
  * @return mixed A szűrt és tisztított érték, vagy az eredeti érték, ha nem támogatott típus.
  */
-function filter_sanitize($value)
+function sanitize($value)
 {
   $type = gettype($value);
 
@@ -163,4 +168,8 @@ function cookie($key)
 function public_file($path)
 {
   return "/public/{$path}";
+}
+
+function arr_to_obj($arr) {
+  return json_decode(json_encode($arr));
 }

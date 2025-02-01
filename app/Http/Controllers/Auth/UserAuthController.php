@@ -40,9 +40,9 @@ class UserAuthController extends Controller
   public function create()
   {
     Session::create();
-   
+
     if (Session::get('user')) {
-      return Navigator::redirect('/dashboard');
+      return Navigator::redirect('/user');
     }
 
     echo view('components/layout', [
@@ -55,6 +55,9 @@ class UserAuthController extends Controller
   public function loginPage()
   {
     Session::create();
+    if (Session::get('user')) {
+      return Navigator::redirect('/user');
+    }
     echo view('components/layout', [
       'root' => view('auth/store', [
         "errors" => Session::get('errors') ?? []
@@ -78,8 +81,8 @@ class UserAuthController extends Controller
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    $email = filter_sanitize($validated['email']) ?? null;
-    $password = filter_sanitize($validated['password']) ?? null;
+    $email = sanitize($validated['email']) ?? null;
+    $password = sanitize($validated['password']) ?? null;
 
     $authenticated = $this->auth->attempt($email, $password, 'users');
 
@@ -88,7 +91,7 @@ class UserAuthController extends Controller
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    return Navigator::redirect('/dashboard');
+    return Navigator::redirect('/user');
   }
 
   public function store()
@@ -106,8 +109,8 @@ class UserAuthController extends Controller
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    $email = filter_sanitize($validated['email']) ?? null;
-    $password = filter_sanitize($validated['password']) ?? null;
+    $email = sanitize($validated['email']) ?? null;
+    $password = sanitize($validated['password']) ?? null;
 
     $this->model->insertIntoTable('users', [
       'name' => $faker->name(),
@@ -122,7 +125,7 @@ class UserAuthController extends Controller
 
     $this->mailer->prepare("arpadsz@max.hu", "Teszt")->template('test', ['email' => $email])->send();
 
-    return Navigator::redirect('/dashboard');
+    return Navigator::redirect('/user');
   }
 
   public function logout()

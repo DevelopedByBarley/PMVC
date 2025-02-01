@@ -24,6 +24,8 @@ class Authenticator
 
   public static function login($entity, $email)
   {
+    Session::create();
+    
     $_SESSION[$entity] = (object)[
       'email' => $email
     ];

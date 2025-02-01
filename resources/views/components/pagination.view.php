@@ -1,12 +1,12 @@
 <?php
-if (!isset($paginated->total_pages)) return;
 $currentPage = $_GET['offset'] ?? 1;
+
 $totalPages = (int)$paginated->total_pages; // összes oldalszám
 $searchParameter = isset($_GET['search']) ? '?search=' . $_GET['search'] : '';
 
 ?>
 
-<nav class="mt-10 d-flex justify-content-between">
+<nav class="d-flex justify-content-between">
   <ul class="pagination">
     <li class="page-item <?php echo $currentPage <= 1 ? 'disabled' : ''; ?>">
       <a class="page-link" href="<?php echo $searchParameter . (empty($searchParameter) ? '?' : '&') . 'offset=' . max(1, $currentPage - 1); ?>" aria-label="Previous">
@@ -24,7 +24,7 @@ $searchParameter = isset($_GET['search']) ? '?search=' . $_GET['search'] : '';
       </a>
     </li>
     <form class="d-flex mx-2">
-      <input type="search" id="search" name="search" value="<?= $_GET['search'] ?? '' ?>" class="form-control " />
+      <input type="search" id="search" name="search" value="<?= $_GET['search'] ?? ''?>" class="form-control " />
       <button class="btn btn-primary">
         <i class="fas fa-search"></i>
       </button>

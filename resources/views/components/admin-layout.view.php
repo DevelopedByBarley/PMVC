@@ -12,13 +12,14 @@
 
 <body>
   <!-- Navbar -->
-  <?php require_once base_path('resources/views/components/toast.view.php')?>
+  <?php require_once view_path('components/admin-navbar')?>
+  <?php require_once view_path('components/toast')?>
   <?= $root ?>
   
   <!--Footer-->
   
   <script type="module" src="/resources/js/main.js"></script>
-  <script src="resources/bootstrap/js/bootstrap.bundle.js?v=<?= time() ?>"></script>
+  <script src="/resources/bootstrap/js/bootstrap.bundle.js?v=<?= time() ?>"></script>
 </body>
 
 </html>

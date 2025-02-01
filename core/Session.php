@@ -28,8 +28,9 @@ class Session
     return $_SESSION[$key] ?? $_SESSION['_flash'][$key] ?? $default;
   }
 
-  public static function unset($key) {
-    unset($_SESSION[$key]);
+  public static function unset($key)
+  {
+    if (isset($_SESSION[$key])) unset($_SESSION[$key]);
   }
 
   public static function flash($key, $value)
@@ -39,10 +40,11 @@ class Session
 
   public static function unflash()
   {
-    unset($_SESSION['_flash']);
+    if (isset($_SESSION['_flash'])) unset($_SESSION['_flash']);
   }
 
-  public static function flush() {
+  public static function flush()
+  {
     $_SESSION = [];
   }
 }

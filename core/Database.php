@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Exception;
 use PDO;
 use PDOException;
 
@@ -115,6 +116,11 @@ class Database
         }
     }
 
+    public function getLastInsertedId()
+    {
+        return $this->connection->lastInsertId();
+    }
+
     /**
      * Fetches all results from the executed query.
      *
@@ -165,15 +171,6 @@ class Database
         return $this->query;
     }
 
-    /**
-     * Paginates the results of the current query.
-     *
-     * @param int $itemsPerPage The number of items per page (default is 10).
-     * @param int|null $currentPage The current page (defaults to $_GET['offset'] or 1).
-     * @param array $search An array of search parameters (optional).
-     * @param array $search_columns The columns to search by (default is ['email']).
-     * @return array The paginated results.
-     */
     public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = [])
     {
         try {
@@ -182,6 +179,29 @@ class Database
 
             $searchCondition = '';
             $searchParams = [];
+
+            if (is_string($search) && !empty($search_columns)) {
+                $searchParts = [];
+                foreach ($search_columns as $column) {
+                    $searchParts[] = "$column LIKE :search";
+                }
+                $searchCondition = ' WHERE ' . implode(' OR ', $searchParts);
+                $searchParams[':search'] = "%$search%";
+            }
+
+            if (is_array($search) && !empty($search)) {
+                $searchParts = [];
+                foreach ($search as $key => $value) {
+                    if (in_array($key, $search_columns) && !empty($value)) {
+                        $searchParts[] = "$key LIKE :$key";
+                        $searchParams[":$key"] = "%$value%";
+                    }
+                }
+
+                if (!empty($searchParts)) {
+                    $searchCondition = ' WHERE ' . implode(' AND ', $searchParts);
+                }
+            }
 
             $countQuery = preg_replace('/SELECT .*? FROM/', 'SELECT COUNT(*) as total FROM', $this->query, 1) . $searchCondition;
             $paginatedQuery = $this->query . $searchCondition . " LIMIT :limit OFFSET :offset";
@@ -204,16 +224,15 @@ class Database
             $this->statement->bindValue(':offset', $offset, PDO::PARAM_INT);
             $this->statement->execute();
 
-            return (object)[
-                'data' => $this->statement->fetchAll(PDO::FETCH_OBJ),
+            return [
+                'data' => (object)$this->statement->fetchAll(PDO::FETCH_OBJ),
                 'total_records' => $totalRecords,
                 'total_pages' => $totalPages,
                 'current_page' => $currentPage,
                 'items_per_page' => $itemsPerPage,
             ];
-        } catch (PDOException $e) {
-            Log::critical('Database fail in paginate method', 'Query: ' . $this->query . ' Error: ' . $e->getMessage());
-            dd($e->getMessage());
+        } catch (Exception $e) {
+            dd("Pagination query failed: " . $e->getMessage());
         }
     }
 }

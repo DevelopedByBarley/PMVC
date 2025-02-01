@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Model;
+/* use App\Models\Model;
 
 echo '<pre>';
 function populate($data)
@@ -36,3 +36,4 @@ $results = (new Model())->leftJoin(
 
 
 populate($results);
+ */

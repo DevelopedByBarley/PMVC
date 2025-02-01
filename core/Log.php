@@ -36,6 +36,5 @@ class Log
   public static function critical($message, $dev = null, $logFile = 'app')
   {
     self::log('CRITICAL', $logFile, $message, $dev);
-    dd('');
   }
 }

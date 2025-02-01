@@ -2,8 +2,6 @@
 
 <?php
 
-use App\Http\Controllers\Auth\AdminAuthController;
-use App\Http\Controllers\Auth\UserAuthController;
 use Core\Language;
 use Core\Navigator;
 use Core\Request;
@@ -14,28 +12,9 @@ $router->post('/lang', function() {
   Navigator::redirectBack();
 });
 
+require base_path('routes/admin.php');
+require base_path('routes/user.php');
+require base_path('routes/auth/user_auth.php');
+require base_path('routes/auth/admin_auth.php');
 
 
-// Admin Auth Routes
-
-$router->get('/admin', [AdminAuthController::class, 'create']);
-$router->get('/admin/dashboard', [AdminAuthController::class, 'index'])->only('admin');
-$router->get('/admin/logout', [AdminAuthController::class, 'logout'])->only('admin');
-
-
-$router->post('/admin', [AdminAuthController::class, 'store']);
-$router->post('/admin/register', [AdminAuthController::class, 'register']);
-
-
-// User Auth Routes
-
-$router->get('/login', [UserAuthController::class, "loginPage"]);
-$router->get('/register', [UserAuthController::class, 'create']);
-
-
-$router->get('/dashboard', [UserAuthController::class, 'index'])->only('auth');
-$router->get('/profile', [UserAuthController::class, 'show'])->only('auth');
-
-$router->post('/logout', [UserAuthController::class, 'logout'])->only('auth');
-$router->post('/user', [UserAuthController::class, 'store']);
-$router->post('/login', [UserAuthController::class, 'login']);

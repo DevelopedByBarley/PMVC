@@ -4,7 +4,6 @@ namespace Core;
 
 use Exception;
 
-
 class Validator
 {
   protected $ret = [];
@@ -15,24 +14,25 @@ class Validator
     foreach ($rules as $key => $rule) {
       $ret[$key] = $rule;
     }
-
     return $ret;
   }
 
-
   public static function validate($request, $rules)
   {
-
     $ret = [];
     $rules = static::structure($rules);
 
     foreach ($request as $req_key => $req_value) {
-      $req_value =  filter_sanitize($req_value);
+      $req_value = sanitize($req_value);
+
+      if ($req_value === '') {
+        $req_value = null;
+      }
+
       $validator = $rules[$req_key] ?? [];
-      foreach ($validator as  $val_value) {
+      foreach ($validator as $val_value) {
         if (strpos($val_value, ':')) {
           $parts = explode(":", $val_value);
-
           $validatorName = $parts[0];
           $validatorValue = $parts[1];
 
@@ -48,7 +48,6 @@ class Validator
         }
       }
     }
-
 
     $errors = static::errors($ret);
     if (!empty($errors)) return ValidationException::throw($errors, $request);
@@ -66,108 +65,58 @@ class Validator
         }
       }
     }
-
     return $errors;
   }
 
   protected static function required($value)
   {
-    if (!$value || $value === '') return true;
-    return true;
+    return !empty($value);
   }
   protected static function string($value)
   {
-    return (bool)is_string($value);
+    return is_string($value);
   }
   protected static function min($value, $length)
   {
-    return (int)strlen($value) >= $length;
+    return strlen($value) >= $length;
   }
   protected static function max($value, $length)
   {
-    return (int)strlen($value) <= $length;
+    return strlen($value) <= $length;
   }
-
-  public static function password($value)
+  protected static function numeric($value)
   {
-    $hasUpperCase = preg_match('/[A-Z]/', $value);
-    $hasLowerCase = preg_match('/[a-z]/', $value);
-    $hasNumber = preg_match('/\d/', $value);
-    $hasSpecialChar = preg_match('/[!@#$%^&*(),.?":{}|<>]/', $value);
-    $isLengthValid = strlen($value) >= 8;
-
-    return $hasUpperCase && $hasLowerCase && $hasNumber && $hasSpecialChar && $isLengthValid;
+    return is_numeric($value);
   }
-
-  public static function comparePw($password, $confirmPassword)
+  protected static function date($value)
   {
-    return $password === $confirmPassword;
+    return strtotime($value) !== false;
   }
-
-  public static function unique($value, $params)
-  {
-    $paramsArray = explode('|', $params);
-
-    if (count($paramsArray) < 2) {
-      throw new Exception("Hibás bemenet: a paraméterek nem megfelelőek.");
-    }
-
-    $db = trim($paramsArray[1]); // Táblanév
-    $record = trim($paramsArray[0]); // Oszlopnév
-
-    $sql = "SELECT COUNT(*) as count FROM `$db` WHERE `$record` = :value";
-
-    $result = (new Database)->query($sql, ["value" => $value])->get()[0];
-
-    return (int)$result->count === 0;
-  }
-  
-  
   public static function phone($value)
   {
     $cleanValue = preg_replace('/[\s\-]/', '', $value);
     $pattern = '/^(?:\+36|06)\d{9}$/';
-
     return preg_match($pattern, $cleanValue);
   }
-
   public static function email($value)
   {
     return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
   }
-
   public static function noSpaces($value)
   {
-    if (strpos($value, ' ') !== false) return false;
-    return true;
+    return strpos($value, ' ') === false;
   }
-
-  public static function num($value)
-  {
-    if (!is_numeric($value)) return false;
-    return true;
-  }
-
-
-  public static function hasNum($value)
-  {
-    return preg_match('/\d/', $value);
-  }
-
-  public static function hasUppercase($value)
-  {
-    return preg_match('/[A-Z]/', $value);
-  }
-
   public static function split($value)
   {
     $words = explode(' ', trim($value));
     return count($words) >= 2 && strlen($words[1]) > 0;
   }
 
+  protected static function nullable($value)
+  {
 
-
-
+    return $value ?? ($value === null || $value === '');
+  }
 
 
   private static function errorMessages($validator, $param = '')
@@ -180,7 +129,7 @@ class Validator
       ],
       'string' => [
         'hu' => "A mező csak szöveg lehet!",
-        'en' => "The field must be at least {$param} characters long.",
+        'en' => "The field must be a string.",
       ],
       'min' => [
         'hu' => "A mező nem lehet rövidebb, mint {$param} karakter.",
@@ -191,15 +140,52 @@ class Validator
         'en' => "The field cannot be longer than {$param} characters.",
       ],
       'email' => [
-        'hu' => "Kérjük adjon meg igazi email címet.",
+        'hu' => "Kérjük, adjon meg valódi email címet.",
         'en' => "Please enter a valid email address.",
       ],
       'unique' => [
-        'hu' => "Ezekkel az adatokkal már nem lehet regisztrálni, kérjük próbálja meg más adatokkal..",
-        'en' => "You can not register with that datas, please try again.",
+        'hu' => "Ezekkel az adatokkal már nem lehet regisztrálni, kérjük próbálja meg más adatokkal.",
+        'en' => "You cannot register with this data, please try again.",
+      ],
+      'password' => [
+        'hu' => "A jelszónak tartalmaznia kell legalább 8 karaktert, kis- és nagybetűt, számot és speciális karaktert.",
+        'en' => "The password must contain at least 8 characters, including uppercase and lowercase letters, a number, and a special character.",
+      ],
+      'comparePw' => [
+        'hu' => "A két jelszó nem egyezik.",
+        'en' => "The passwords do not match.",
+      ],
+      'phone' => [
+        'hu' => "Érvénytelen telefonszám formátum.",
+        'en' => "Invalid phone number format.",
+      ],
+      'noSpaces' => [
+        'hu' => "A mező nem tartalmazhat szóközt.",
+        'en' => "The field cannot contain spaces.",
+      ],
+      'num' => [
+        'hu' => "A mezőnek számnak kell lennie.",
+        'en' => "The field must be a number.",
+      ],
+      'hasNum' => [
+        'hu' => "A mezőnek tartalmaznia kell legalább egy számot.",
+        'en' => "The field must contain at least one number.",
+      ],
+      'hasUppercase' => [
+        'hu' => "A mezőnek tartalmaznia kell legalább egy nagybetűt.",
+        'en' => "The field must contain at least one uppercase letter.",
+      ],
+      'split' => [
+        'hu' => "A mezőnek legalább két szót kell tartalmaznia.",
+        'en' => "The field must contain at least two words.",
+      ],
+      'nullable' => [
+        'hu' => "A mező kitöltése nem kötelező.",
+        'en' => "This field is optional"
       ]
+
     ];
 
-    return $messages[$validator][$lang];
+    return $messages[$validator][$lang] ?? "Valdiációs hiba, a validátor vagy hibaüzenet nem létezik.";
   }
 }

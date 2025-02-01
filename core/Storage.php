@@ -86,10 +86,12 @@ class Storage
     }
     if (!empty($this->files)) {
       foreach ($this->files as $file) {
-        $this->saveFile($file, $path);
+        $fileNames = $this->saveFile($file, $path);
+        return $fileNames;
       }
     } else {
-      $this->saveFile($this->file, $path);
+      $fileName = $this->saveFile($this->file, $path);
+      return $fileName;
     }
   }
 
@@ -106,6 +108,8 @@ class Storage
 
     $destination = $directoryPath . '/' . $originalFileName;
     move_uploaded_file($file["tmp_name"], $destination);
+
+    return $originalFileName;
   }
 
 
