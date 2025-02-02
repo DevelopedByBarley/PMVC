@@ -2,5 +2,5 @@
 
 use App\Http\Controllers\UserController;
 
-$router->get('/user/profile', [UserController::class, 'show'])->middleware(['auth']);
-$router->except(['show'])->resources('user', UserController::class, ['auth']);
+$router->get('/user/profile', [UserController::class, 'show'])->middleware(['auth', 'verify']);
+$router->except(['show', 'create'])->resources('user', UserController::class, ['auth', 'verify']);

@@ -4,18 +4,23 @@ namespace Core;
 
 class Authenticator
 {
-  public function attempt($email, $password, $table = 'users')
+  public function attempt($email, $password, $table = 'users', $verified = false)
   {
     $db = Database::getInstance();
 
     $user = $db->query("SELECT * FROM $table WHERE email = :email", [
       'email' => $email
     ])->find();
+
+    if ($verified && is_null($user->email_verified_at)) {
+      return false;
+    };
+
     if ($user) {
       if (password_verify($password, $user->password)) {
         $this->login(rtrim($table, 's'), $email);
 
-        return true;
+        return $user;
       }
     }
 
@@ -24,8 +29,6 @@ class Authenticator
 
   public static function login($entity, $email)
   {
-    Session::create();
-    
     $_SESSION[$entity] = (object)[
       'email' => $email
     ];

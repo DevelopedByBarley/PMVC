@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Core\EmailVerify;
 use Core\Faker;
 use Core\Navigator;
 use Core\Session;
 use Core\Storage;
+use Core\Token;
 use Core\ValidationException;
 //index, show, create, edit, delete
 
@@ -84,11 +86,11 @@ class UserAuthController extends Controller
     $email = sanitize($validated['email']) ?? null;
     $password = sanitize($validated['password']) ?? null;
 
-    $authenticated = $this->auth->attempt($email, $password, 'users');
+    $authenticated = $this->auth->attempt($email, $password, 'users', true);
 
     if (!$authenticated) {
       Session::flash('old', $this->request->all());
-      return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
+      return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal, vagy erősítse meg regisztrációját az emailben kapott linken!')->back();
     }
 
     return Navigator::redirect('/user');
@@ -100,7 +102,7 @@ class UserAuthController extends Controller
     $faker = Faker::create();
     try {
       $validated = $this->request->validate([
-        "email" => ['required'],
+        "email" => ['required', 'unique:email|users'],
         "password" => ['required'],
       ]);
     } catch (ValidationException $exception) {
@@ -112,20 +114,30 @@ class UserAuthController extends Controller
     $email = sanitize($validated['email']) ?? null;
     $password = sanitize($validated['password']) ?? null;
 
-    $this->model->insertIntoTable('users', [
+    $last_id = $this->model->insertIntoTable('users', [
       'name' => $faker->name(),
       'phone' => $faker->phoneNumber(),
-      'BIO' => $faker->text(100),
       'email' => $email,
       'password' => password_hash($password, PASSWORD_DEFAULT)
     ]);
 
 
-    $this->auth::login('user', $email);
+    if ($last_id) {
 
-    $this->mailer->prepare("arpadsz@max.hu", "Teszt")->template('test', ['email' => $email])->send();
+      $token = new Token();
 
-    return Navigator::redirect('/user');
+      [$based, $token, $expires_at] = $token->from($email)->generate()->all();
+
+      $verify = new EmailVerify();
+
+      $verify->store($last_id, $token, $expires_at)->send($email, $based);
+
+
+      //$this->auth::login('user', $email);
+      //this->mailer->prepare("arpadsz@max.hu", "Teszt")->template('test', ['email' => $email])->send();
+
+      $this->toast->success('Sikeres regisztráció, kérjük erősítse meg e-mail címére küldött levéllel a regisztrációját.')->back();
+    }
   }
 
   public function logout()

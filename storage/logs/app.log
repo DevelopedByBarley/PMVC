@@ -1,1 +1,11 @@
 [2025-01-29 19:31:33] INFO: File mimetype is not allowed
+[2025-02-01 20:23:12] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S22]: Column not found: 1054 Unknown column 'BIO' in 'field list'
+[2025-02-01 20:27:55] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-01 20:29:54] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-01 20:30:00] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-01 21:01:34] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1

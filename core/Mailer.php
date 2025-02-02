@@ -11,8 +11,7 @@ class Mailer
 
   public function __construct()
   {
-    $config = require_once base_path('config/mail.php');
-
+    $config = require base_path('config/mail.php');
     if ($config['usage'] === 'work') {
       $this->mail = new PHPMailer(true);
 

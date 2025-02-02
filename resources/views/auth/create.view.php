@@ -4,7 +4,7 @@
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card" style="border-radius: 1rem;">
           <div class="card-body p-5 text-center">
-            <form action="/user" method="POST" enctype="multipart/form-data">
+            <form action="/register" method="POST" enctype="multipart/form-data">
               <?= csrf() ?>
               <div class="mt-md-4 pb-5">
 
