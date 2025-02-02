@@ -9,3 +9,9 @@
 [DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
 [2025-02-01 21:01:34] CRITICAL: Database fail in query method
 [DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 10:48:26] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 10:48:31] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 10:52:09] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1

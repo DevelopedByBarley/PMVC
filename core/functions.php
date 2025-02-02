@@ -35,7 +35,7 @@ function urlIs($value)
 
 function urlContains($needle)
 {
-    return strpos($_SERVER['REQUEST_URI'], $needle) !== false;
+  return strpos($_SERVER['REQUEST_URI'], $needle) !== false;
 }
 
 function abort($code = 404)
@@ -127,7 +127,7 @@ function sanitize($value)
     case 'boolean':
       return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     case 'array':
-      return array_map('filter_sanitize', $value);
+      return array_map('sanitize', $value);
     case 'NULL':
       return null;
     default:
@@ -170,6 +170,7 @@ function public_file($path)
   return "/public/{$path}";
 }
 
-function arr_to_obj($arr) {
+function arr_to_obj($arr)
+{
   return json_decode(json_encode($arr));
 }

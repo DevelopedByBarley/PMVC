@@ -9,8 +9,9 @@ class Router
 	protected $routes = [];
 	protected $routes_of_resources = [
 		'index'   => ['GET', ''],
-		'show'    => ['GET', '/{id}'],
 		'create'  => ['GET', '/create'],
+		'show'    => ['GET', '/{id}'],
+		'edit'    => ['GET', '/edit/{id}'],
 		'store'   => ['POST', ''],
 		'update'  => ['PATCH', '/{id}'],
 		'destroy' => ['DELETE', '/{id}'],
