@@ -6,7 +6,7 @@ use Core\Language;
 use Core\Navigator;
 use Core\Request;
 
-$router->view('/', 'components/layout', 'welcome');
+$router->view('/', 'components/layout', 'welcome')->middleware('guest');
 $router->post('/lang', function() {
   Language::switch(Request::key('lang'));
   Navigator::redirectBack();

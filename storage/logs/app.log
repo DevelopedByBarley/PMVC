@@ -15,3 +15,39 @@
 [DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
 [2025-02-02 10:52:09] CRITICAL: Database fail in query method
 [DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 17:21:47] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 17:21:53] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 17:21:56] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 17:22:39] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 17:22:42] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 17:31:51] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' posts.body AS post_body FROM users LEFT JOIN posts ON posts.user_id = user.id' at line 1
+[2025-02-02 17:31:51] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' posts.body AS post_body FROM users LEFT JOIN posts ON posts.user_id = user.id' at line 1
+[2025-02-02 17:31:51] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' posts.body AS post_body FROM users LEFT JOIN posts ON posts.user_id = user.id' at line 1
+[2025-02-02 17:32:42] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42S22]: Column not found: 1054 Unknown column 'user.id' in 'on clause'
+[2025-02-02 17:32:50] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42S22]: Column not found: 1054 Unknown column 'uses.id' in 'on clause'
+[2025-02-02 17:32:50] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42S22]: Column not found: 1054 Unknown column 'uses.id' in 'on clause'
+[2025-02-02 17:32:50] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42S22]: Column not found: 1054 Unknown column 'uses.id' in 'on clause'
+[2025-02-02 17:43:32] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM users LEFT JOIN posts ON posts.user_id = users.id' at line 1
+[2025-02-02 17:43:33] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM users LEFT JOIN posts ON posts.user_id = users.id' at line 1
+[2025-02-02 17:43:44] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'created_at' in field list is ambiguous
+[2025-02-02 17:43:44] CRITICAL: Database fail in execute method
+[DEV] Fail in Database class execute function with message:SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'created_at' in field list is ambiguous
+[2025-02-02 19:27:25] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-02-02 19:27:30] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1

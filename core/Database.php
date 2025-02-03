@@ -70,9 +70,9 @@ class Database
     public function where($column, $operator, $value)
     {
         if (stripos($this->query, 'WHERE') === false) {
-            $this->query .= " WHERE $column $operator :$column";
+            $this->query .= " WHERE $column $operator :$value";
         } else {
-            $this->query .= " AND $column $operator :$column";
+            $this->query .= " AND $column $operator :$value";
         }
 
         return $this;
@@ -224,7 +224,7 @@ class Database
             $this->statement->bindValue(':offset', $offset, PDO::PARAM_INT);
             $this->statement->execute();
 
-            return [
+            return (object)[
                 'data' => (object)$this->statement->fetchAll(PDO::FETCH_OBJ),
                 'total_records' => $totalRecords,
                 'total_pages' => $totalPages,

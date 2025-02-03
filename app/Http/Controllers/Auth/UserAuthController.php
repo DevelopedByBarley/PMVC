@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Core\EmailVerify;
 use Core\Faker;
 use Core\Navigator;
@@ -14,6 +15,13 @@ use Core\ValidationException;
 
 class UserAuthController extends Controller
 {
+  private $User;
+
+  public function __construct()
+  {
+    parent::__construct();
+    $this->User = new User();
+  }
 
 
   public function index()
@@ -30,7 +38,6 @@ class UserAuthController extends Controller
   public function show()
   {
     $user =  Session::get('user');
-    $user->notes = $this->model->join('notes', 'user_id', $user->id);
 
     echo view('components/layout', [
       'root' => view('auth/show', [
@@ -114,7 +121,7 @@ class UserAuthController extends Controller
     $email = sanitize($validated['email']) ?? null;
     $password = sanitize($validated['password']) ?? null;
 
-    $last_id = $this->model->insertIntoTable('users', [
+    $last_id = $this->User->create([
       'name' => $faker->name(),
       'phone' => $faker->phoneNumber(),
       'email' => $email,

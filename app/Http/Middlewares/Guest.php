@@ -9,9 +9,12 @@ class Guest
 
     public function handle()
     {
-        Session::create();
         if (isset($_SESSION['user'])) {
-            return header('Location: /logjn');
+            return header('Location: /user');
+            exit();
+        }
+        if (isset($_SESSION['admin'])) {
+            return header('Location: /admin/dashboard');
             exit();
         }
     }

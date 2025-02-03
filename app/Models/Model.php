@@ -11,72 +11,48 @@ use PDO;
 class Model
 {
   protected $db;
+  protected $table; // A model specifikus tábla neve
 
   public function __construct()
   {
     $this->db = Database::getInstance();
-  }
 
-  public function join($table, $join_table_id_name, $id)
-  {
-    try {
-      return $this->db->query("SELECT * FROM $table WHERE $join_table_id_name = :id", ['id' => $id])->get();
-    } catch (Exception $e) {
-      Log::critical("Database join error in Model.", "Database error: " . $e->getMessage());
-      return null;
+    if (!isset($this->table)) {
+      throw new Exception("Table property is not defined in " . get_called_class());
     }
   }
 
-  public function all($table, $withPaginate = false, $search = '' || [], $search_columns = [])
+
+  public function all($withPaginate = false, $search = '' || [], $search_columns = [])
   {
     try {
-      return !$withPaginate 
-        ? $this->db->query("SELECT * FROM $table")->get() 
-        : $this->db->prepare("SELECT * FROM $table")->paginate(25, null, $search, $search_columns);
+      return !$withPaginate
+        ? $this->db->query("SELECT * FROM $this->table")->get()
+        : $this->db->prepare("SELECT * FROM $this->table")->paginate(25, null, $search, $search_columns);
     } catch (Exception $e) {
       Log::critical("Database all error in Model.", "Database error: " . $e->getMessage());
       return null;
     }
   }
 
-  public function findAll($table, $id)
+  public function find($id)
   {
     try {
-      return $this->db->query("SELECT * FROM $table WHERE id = :id", ['id' => $id])->get();
-    } catch (Exception $e) {
-      Log::critical("Database findAll error in Model.", "Database error: " . $e->getMessage());
-      return null;
-    }
-  }
-
-  public function find($id, $table)
-  {
-    try {
-      return $this->db->query("SELECT * FROM $table WHERE id = :id", ['id' => $id])->find();
+      return $this->db->query("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->find();
     } catch (Exception $e) {
       Log::critical("Database find error in Model.", "Database error: " . $e->getMessage());
       return null;
     }
   }
 
-  public function destroy($table, $id)
+  public function create(array $data, array $exceptions = [])
   {
-    try {
-      return $this->db->query("DELETE FROM $table WHERE id = :id", ['id' => $id]);
-    } catch (Exception $e) {
-      Log::critical("Database destroy error in Model.", "Database error: " . $e->getMessage());
-      return false;
-    }
+    return $this->insertIntoTable($this->table, $data, $exceptions);
   }
 
-  public function destroyAll($table, $condition, $params = [])
+  public function update(array $data, $condition, array $exceptions = [])
   {
-    try {
-      return $this->db->query("DELETE FROM $table WHERE $condition", $params);
-    } catch (Exception $e) {
-      Log::critical("Database destroyAll error in Model.", "Database error: " . $e->getMessage());
-      return false;
-    }
+    return $this->updateTable($this->table, $data, $condition, $exceptions);
   }
 
   public function insertIntoTable($table, $data, $exceptions = [])
@@ -86,11 +62,11 @@ class Model
       if (empty($filteredData)) {
         throw new InvalidArgumentException('No data to insert due to exceptions.');
       }
-      
+
       $columns = implode(", ", array_keys($filteredData));
       $placeholders = implode(", ", array_map(fn($key) => ":$key", array_keys($filteredData)));
       $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
-      
+
       return $this->db->query($sql, $filteredData)->getLastInsertedId();
     } catch (Exception $e) {
       Log::critical("Database insert error in Model.", "Database error: " . $e->getMessage());
@@ -105,10 +81,10 @@ class Model
       if (empty($filteredData)) {
         throw new InvalidArgumentException('No data to update due to exceptions.');
       }
-      
+
       $set = implode(", ", array_map(fn($key) => "$key = :$key", array_keys($filteredData)));
       $sql = "UPDATE $table SET $set WHERE $condition";
-      
+
       return $this->db->query($sql, $filteredData);
     } catch (Exception $e) {
       Log::critical("Database update error in Model.", "Database error: " . $e->getMessage());
@@ -116,32 +92,13 @@ class Model
     }
   }
 
-  public function paginateByQuery($base_query, $limit = 1, $search = [], $search_columns = [])
+  public function destroy($id)
   {
     try {
-      return $this->db->prepare($base_query)->paginate($limit, null, $search, $search_columns);
+      return $this->db->query("DELETE FROM $this->table WHERE id = :id", ['id' => $id]);
     } catch (Exception $e) {
-      Log::critical("Database paginateByQuery error in Model.", "Database error: " . $e->getMessage());
-      return null;
-    }
-  }
-
-  public function leftJoin($base_query, $joins = [], $conditions = null, $params = [], $fetch = 'multiple')
-  {
-    try {
-      $query = $base_query;
-      foreach ($joins as $join) {
-        $query .= ' LEFT JOIN ' . $join['table'] . ' ON ' . $join['on'];
-      }
-      if ($conditions) {
-        $query .= ' WHERE ' . $conditions;
-      }
-      return $fetch === 'multiple'
-        ? $this->db->query($query, $params)->get(PDO::FETCH_ASSOC)
-        : $this->db->query($query, $params)->find(PDO::FETCH_ASSOC);
-    } catch (Exception $e) {
-      Log::critical("Database leftJoin error in Model.", "Database error: " . $e->getMessage());
-      return null;
+      Log::critical("Database destroy error in Model.", "Database error: " . $e->getMessage());
+      return false;
     }
   }
 }

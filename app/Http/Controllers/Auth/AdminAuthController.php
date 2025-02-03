@@ -3,16 +3,24 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use Core\Navigator;
 use Core\Session;
 use Core\ValidationException;
 
 class AdminAuthController extends Controller
 {
+  private $Admin;
+
+  public function __construct()
+  {
+    parent::__construct();
+    $this->Admin = new Admin();
+  }
 
   public function register()
   {
-    $this->model->insertIntoTable('admins', [
+    $this->Admin->create([
       'email' => "developedbybarley@gmail.com",
       'password' => password_hash('Csak1enter@test', PASSWORD_DEFAULT)
     ]);

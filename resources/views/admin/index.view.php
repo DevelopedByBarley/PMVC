@@ -4,7 +4,7 @@
   <div class="d-flex flex-column  h-lg-full ">    <!-- Main content -->
     <div class="h-screen flex-grow-1 overflow-y-lg-auto">
       <!-- Header -->
-      <?php require_once view_path('components/admin-heading') ?>
+      <?php require_once view_path('components/heading') ?>
       <main class="pt-3 pb-6 bg-surface-secondary">
         <div class="container-fluid">
           <!-- Card stats -->
@@ -104,7 +104,7 @@
           </div>
           <div class="card shadow border-0 mb-7">
             <div class="card-header">
-              <h5 class="mb-0">Adminok és Edzők</h5>
+              <h5 class="mb-0">Adminok</h5>
 
             </div>
             <div class="table-responsive">
