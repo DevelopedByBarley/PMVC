@@ -14,6 +14,7 @@ $router->post('/lang', function() {
 
 require base_path('routes/admin.php');
 require base_path('routes/user.php');
+require base_path('routes/test.php');
 require base_path('routes/auth/user_auth.php');
 require base_path('routes/auth/admin_auth.php');
 require base_path('routes/auth/verify_email.php');

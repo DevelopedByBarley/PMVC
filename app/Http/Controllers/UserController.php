@@ -15,8 +15,7 @@ class UserController extends Controller
     parent::__construct();
     $this->User = new User();
   }
-
-
+ 
   public function index()
   {
     $search = $_GET['search'] ?? '';

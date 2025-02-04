@@ -9,8 +9,8 @@ class Router
 	protected $routes = [];
 	protected $routes_of_resources = [
 		'index'   => ['GET', ''],
-		'create'  => ['GET', '/create'],
 		'show'    => ['GET', '/{id}'],
+		'create'  => ['GET', '/create'],
 		'edit'    => ['GET', '/edit/{id}'],
 		'store'   => ['POST', ''],
 		'update'  => ['PATCH', '/{id}'],
@@ -116,7 +116,9 @@ class Router
 
 		// Route iteration and check pattern
 		foreach ($this->routes as $route) {
-			$pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '([^/]+)', $route['uri']);
+			$pattern = preg_replace('/\{id\}/', '(\d+)', $route['uri']);
+			// Az egyéb paraméterek továbbra is elfogadnak bármit
+			$pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '([^/]+)', $pattern);
 			$pattern = "#^" . $pattern . "$#";
 
 			// If pattern ok and $route method === $method
