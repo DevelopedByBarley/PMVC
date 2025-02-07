@@ -1,8 +1,6 @@
 <?php
 
 namespace Core;
-
-use Exception;
 use PDO;
 use PDOException;
 
@@ -14,11 +12,12 @@ class Database
     public $statement;
     private $query = '';
     private $redirected = false;
+    private $paginator;
 
     public function __construct()
     {
         $config = require base_path('config/database.php');
-
+        $this->paginator = new Paginator();
 
         try {
             $dsn = 'mysql:host=' . $config['host'] . ';port=' . $config['port'] . ';dbname=' . $config['db_name'] . ';charset=' . $config['charset'];
@@ -171,7 +170,13 @@ class Database
         return $this->query;
     }
 
-    public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = [])
+    public function paginate($limit = 25, $search = [], $search_columns = [])
+    {
+        $data = $this->statement->fetchAll(PDO::FETCH_ASSOC);
+        return $this->paginator->data($data)->filter($search, $search_columns)->paginate($limit);
+    }
+
+   /*  public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = [])
     {
         try {
             $currentPage = $currentPage ?? ($_GET['offset'] ?? 1);
@@ -234,5 +239,5 @@ class Database
         } catch (Exception $e) {
             dd("Pagination query failed: " . $e->getMessage());
         }
-    }
+    } */
 }
