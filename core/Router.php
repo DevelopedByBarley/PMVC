@@ -45,6 +45,8 @@ class Router
 			}
 		}
 
+		$this->exceptions = [];
+
 		return $this;
 	}
 
