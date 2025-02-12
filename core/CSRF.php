@@ -6,7 +6,7 @@ class CSRF
 {
   private $secret;
   private $lifeTime;
-  private $token = 'dsadsddda';
+  private $token = '';
   public $tokens = [];
   private $request;
 
@@ -20,7 +20,6 @@ class CSRF
 
   public function generate()
   {
-    Session::create();
     $this->token = bin2hex(random_bytes(32));
     $encodedToken = hash_hmac('sha256',  $this->token, $this->secret);
 
@@ -41,8 +40,6 @@ class CSRF
 
   public function check()
   {
-    Session::create();
-
     $post_csrf = $this->request->key('csrf');
     $session_csrf_arr = Session::get('csrf');
 

@@ -28,7 +28,7 @@ class Model
     try {
       return !$withPaginate
         ? $this->db->query("SELECT * FROM $this->table")->get()
-        : $this->db->prepare("SELECT * FROM $this->table")->paginate(25, null, $search, $search_columns);
+        : $this->db->query("SELECT * FROM $this->table")->paginate(25, $search, $search_columns);
     } catch (Exception $e) {
       Log::critical("Database all error in Model.", "Database error: " . $e->getMessage());
       return null;
@@ -39,6 +39,16 @@ class Model
   {
     try {
       return $this->db->query("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->find();
+    } catch (Exception $e) {
+      Log::critical("Database find error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+  
+  public function findAll($id)
+  {
+    try {
+      return $this->db->query("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->get();
     } catch (Exception $e) {
       Log::critical("Database find error in Model.", "Database error: " . $e->getMessage());
       return null;

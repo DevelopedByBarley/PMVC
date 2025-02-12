@@ -50,4 +50,9 @@ class EmailVerify
   {
     return $this->db->query("DELETE  FROM verification_tokens WHERE user_id = :user_id", [':user_id' => $user_id]);
   }
+
+  public function deleteExpiredTokens()
+  {
+    return $this->db->query('DELETE FROM verification_tokens WHERE expires_at < NOW()');
+  }
 }

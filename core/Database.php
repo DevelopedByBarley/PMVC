@@ -1,6 +1,8 @@
 <?php
 
 namespace Core;
+
+use Exception;
 use PDO;
 use PDOException;
 
@@ -76,6 +78,32 @@ class Database
 
         return $this;
     }
+
+    public function whereNotNull($column)
+    {
+        if (stripos($this->query, 'WHERE') === false) {
+            $this->query .= " WHERE $column IS NOT NULL";
+        } else {
+            $this->query .= " AND $column IS NOT NULL";
+        }
+
+        return $this;
+    }
+
+
+
+    public function whereNull($column)
+    {
+        if (stripos($this->query, 'WHERE') === false) {
+            $this->query .= " WHERE $column IS NULL";
+        } else {
+            $this->query .= " AND $column IS NULL";
+        }
+
+        return $this;
+    }
+
+
 
     /**
      * Executes the current SQL query with the provided parameters.
@@ -172,11 +200,11 @@ class Database
 
     public function paginate($limit = 25, $search = [], $search_columns = [])
     {
-        $data = $this->statement->fetchAll(PDO::FETCH_ASSOC);
+        $data = $this->statement->fetchAll(PDO::FETCH_OBJ);
         return $this->paginator->data($data)->filter($search, $search_columns)->paginate($limit);
     }
 
-   /*  public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = [])
+    /*   public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = [])
     {
         try {
             $currentPage = $currentPage ?? ($_GET['offset'] ?? 1);

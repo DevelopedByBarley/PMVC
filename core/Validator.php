@@ -30,7 +30,6 @@ class Validator
 
   public static function validate($request, $rules)
   {
-
     $ret = [];
     $rules = static::structure($rules);
 
@@ -129,26 +128,7 @@ class Validator
 
     return (int)$result->count === 0;
   }
-  /*   public static function unique($value, $data)
-  {
-    $pdo = Database::getInstance();
-    if (!$pdo) {
-      throw new PDOException("Database connection failed.");
-    }
 
-    list($table, $entity, $param) = $data;
-
-    try {
-      $data = (new Database)->query("SELECT COUNT(*) FROM `$table` WHERE `$entity` = :entity")->get();
-      
-      return (int)count($data) === 0;
-    } catch (\Throwable $th) {
-      // Handle the exception properly (e.g., log the error, show a generic error message, etc.)
-      error_log($th->getMessage()); // Log the exception message
-      throw new Exception("An error occurred while checking uniqueness."); // Throw a generic error
-    }
-  }
- */
   public static function phone($value)
   {
     $cleanValue = preg_replace('/[\s\-]/', '', $value);
@@ -168,7 +148,7 @@ class Validator
     return true;
   }
 
-  public static function num($value)
+  public static function numeric($value)
   {
     if (!is_numeric($value)) return false;
     return true;
@@ -203,6 +183,10 @@ class Validator
       'required' => [
         'hu' => 'Kitöltés kötelező!',
         'en' => 'This field is required!',
+      ],
+      'password' => [
+        'hu' => "A jelszónak legalább 8 karakter hosszúnak kell lennie, és tartalmaznia kell legalább egy nagybetűt, egy kisbetűt, egy számot és egy speciális karaktert!",
+        'en' => "The password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character!",
       ],
       'string' => [
         'hu' => "A mező csak szöveg lehet!",
