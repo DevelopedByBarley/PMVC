@@ -54,9 +54,13 @@ class Database
      * @param string $second_column The second column for the join condition.
      * @return self The current instance for method chaining.
      */
-    public function leftJoin($table, $first_column, $operator, $second_column)
+    public function leftJoin($table, $conditions)
     {
-        $this->query .= " LEFT JOIN $table ON $first_column $operator $second_column";
+        $onClause = [];
+        foreach ($conditions as $condition) {
+            $onClause[] = "{$condition[0]} {$condition[1]} {$condition[2]}";
+        }
+        $this->query .= " LEFT JOIN $table ON " . implode(' AND ', $onClause);
         return $this;
     }
 
@@ -71,9 +75,9 @@ class Database
     public function where($column, $operator, $value)
     {
         if (stripos($this->query, 'WHERE') === false) {
-            $this->query .= " WHERE $column $operator :$value";
+            $this->query .= " WHERE $column $operator $value";
         } else {
-            $this->query .= " AND $column $operator :$value";
+            $this->query .= " AND $column $operator $value";
         }
 
         return $this;
@@ -196,6 +200,12 @@ class Database
     public function debug()
     {
         return $this->query;
+    }
+
+    public function selectCount($table)
+    {
+        $this->statement = $this->prepare("SELECT COUNT(*) AS count FROM $table");
+        return $this;
     }
 
     public function paginate($limit = 25, $search = [], $search_columns = [])

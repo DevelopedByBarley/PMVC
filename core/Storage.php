@@ -15,7 +15,7 @@ namespace Core;
 class Storage
 {
   private array $whiteList;
-  public array | null $files = null;
+  public $files = null;
   public $file;
 
 
@@ -70,7 +70,7 @@ class Storage
         $imagePath = base_path('public/images' . $path . "/" . $image);
 
         if (file_exists($imagePath)) {
-          unlink($imagePath);  
+          unlink($imagePath);
         }
       }
     }

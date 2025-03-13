@@ -31,9 +31,24 @@ class EmailVerify
     return $this;
   }
 
-  public function send($mail_address, $based_token)
+  public function send($mail_address, $password, $based_token)
   {
-    $this->mailer->prepare($mail_address, 'Regisztráció hitelesítése')->template('email-verify', ['token' => $based_token])->send();
+    if (is_array($mail_address)) {
+      foreach ($mail_address as $address) {
+        $this->mailer->prepare($address, 'Regisztráció hitelesítése')
+          ->template(
+            'email-verify',
+            ['token' => $based_token, 'email' => $mail_address, 'password' => $password]
+          )->send();
+      }
+      return;
+    }
+
+    $this->mailer->prepare($mail_address, 'Regisztráció hitelesítése')
+      ->template(
+        'email-verify',
+        ['token' => $based_token, 'email' => $mail_address, 'password' => $password]
+      )->send();
   }
 
   private function failIfFound($token)

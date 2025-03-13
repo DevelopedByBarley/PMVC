@@ -21,8 +21,16 @@ class Request
   }
 
 
-  public static function validate($rules)
+  public static function validate($rules, $post = null)
   {
-    return Validator::validate($_POST, $rules);
+    $post = $post ? $post : $_POST;
+    return Validator::validate($post, $rules);
+  }
+
+  public static function setNull($key)
+  {
+    if (!$_POST[$key] || !isset($_POST[$key]) || empty($_POST[$key])) {
+      $_POST[$key] = null;
+    }
   }
 }

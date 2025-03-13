@@ -88,17 +88,33 @@ function view_path($path)
   return BASE_PATH . 'resources/views/' . $path . '.view.php';
 }
 
+function tmpPath($file)
+{
+  return BASE_PATH . 'resources/views/messages/' . $file . '.tmp.php';
+}
+
 function mail_temp_path($path)
 {
   return BASE_PATH . 'resources/views/mail/' . $path . '.mt.php';
 }
 
 
-function paginate($paginated)
+function paginate($paginated, $with_search = true)
 {
   require view_path('components/pagination');
 }
+function extractMapUrl($iframe)
+{
+  if (preg_match('/src="([^"]+)"/', $iframe, $matches)) {
+    return $matches[1];
+  }
 
+  if (str_contains($iframe, 'https://www.google.com/maps/embed?pb=')) {
+    return $iframe;
+  }
+
+  return null;
+}
 
 /**
  * Általános szűrő és szanitizáló függvény.
@@ -173,4 +189,47 @@ function public_file($path)
 function arr_to_obj($arr)
 {
   return json_decode(json_encode($arr));
+}
+
+function obj_to_arr($obj)
+{
+  return json_decode(json_encode($obj), true);
+}
+function isUrl(string $expectedUrl): bool
+{
+  $currentUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // Csak az útvonalat vesszük
+  return trim($currentUrl, '/') === trim($expectedUrl, '/');
+}
+
+
+function ud()
+{
+  echo view('status/ud', []);
+}
+
+function deleteImage($path)
+{
+  $full_path = base_path('public' . $path);
+  if (file_exists($full_path)) {
+    unlink($full_path);
+    echo "Fájl törölve: $full_path";
+  } else {
+    echo "A fájl nem található: $full_path";
+  }
+}
+
+function getWeekRange($events)
+{
+  foreach ($events as $event) {
+    $timestamp = strtotime($event->date_time);
+
+    $weekStart = date('Y-m-d', strtotime('monday this week', $timestamp));
+    $weekEnd = date('Y-m-d', strtotime('sunday this week', $timestamp));
+
+    $event->week = "$weekStart - $weekEnd";
+    $event->week_start = $weekStart;
+    $event->week_end = $weekEnd;
+  }
+
+  return $events;
 }

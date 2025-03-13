@@ -8,15 +8,14 @@ class Token
   private $secret;
   private $lifeTime;
   private $token;
-  private $request;
 
   public function __construct()
   {
     $config = require base_path('config/auth.php');
     $this->secret = $config['token']['secret'];
     $this->lifeTime = $config['token']['lifetime'];
-    $this->request = new Request();
   }
+  
   public function from($data)
   {
     $this->data = base64_encode($data);
@@ -53,6 +52,8 @@ class Token
 
   public function attempt($based, $token)
   {
+    if(!$based || !$token) return false;
+    
     $encoded =  hash_hmac('sha256', $based, $this->secret);
 
     if (hash_equals($encoded, $token)) {

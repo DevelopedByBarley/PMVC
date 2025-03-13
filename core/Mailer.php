@@ -12,7 +12,7 @@ class Mailer
   public function __construct()
   {
     $config = require base_path('config/mail.php');
-    if ($config['usage'] === 'work') {
+    if ($config['usage'] === 'production') {
       $this->mail = new PHPMailer(true);
 
       $this->mail->SMTPOptions = array(
@@ -22,7 +22,7 @@ class Mailer
           'allow_self_signed' => true
         )
       );
-      // $mail->SMTPDebug = 3;
+      $mail->SMTPDebug = 2;
 
       $this->mail->CharSet = 'UTF-8';
       $this->mail->IsSMTP();
@@ -31,14 +31,12 @@ class Mailer
       $this->mail->Host = $config['host'];
 
       // Setting the sender's email address
-      $this->mail->setFrom($config['username'], $config['username']);
-      $this->mail->addBCC('arpadsz@max.hu');                           // Titkos másolat (BCC)
+      $this->mail->setFrom($config['from']['address'], $config['from']['name']);
 
       // Adding the recipient's email address
 
       $this->mail->isHTML(true);
       $this->mail->WordWrap = 50;
-
     } else {
       $this->mail = new PHPMailer();
       $this->mail->isSMTP();
@@ -69,6 +67,8 @@ class Mailer
   public function prepare($address, $subject)
   {
     try {
+      $this->mail->clearAddresses();
+
       $this->mail->addAddress($address);
 
       $this->mail->Subject = $subject;

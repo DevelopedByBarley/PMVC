@@ -4,6 +4,31 @@ namespace Core;
 
 class Authenticator
 {
+  public function checkPassword($email, $password, $table = 'users', $verified = false)
+  {
+    $db = Database::getInstance();
+
+    $user = $db->query("SELECT * FROM $table WHERE email = :email", [
+      'email' => $email
+    ])->find();
+
+
+
+    if ($verified && is_null($user->email_verified_at)) {
+      return false;
+    };
+
+    if ($user) {
+      if (password_verify($password, $user->password)) {
+        return $user;
+      }
+    }
+
+    return false;
+  }
+
+  
+
   public function attempt($email, $password, $table = 'users', $verified = false)
   {
     $db = Database::getInstance();
@@ -11,6 +36,8 @@ class Authenticator
     $user = $db->query("SELECT * FROM $table WHERE email = :email", [
       'email' => $email
     ])->find();
+
+
 
     if ($verified && is_null($user->email_verified_at)) {
       return false;
