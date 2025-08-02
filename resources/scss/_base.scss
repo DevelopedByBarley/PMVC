@@ -22,6 +22,13 @@ body {
   font-style: normal;
 }
 
+.is-valid {
+  border-color: map-get($colors, 'green-500') !important;
+}
+.is-invalid {
+  border-color: map-get($colors, 'red-500') !important;
+}
+
 label.required, div.required {
   position: relative;
 
