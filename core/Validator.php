@@ -3,7 +3,6 @@
 namespace Core;
 
 use Exception;
-use Illuminate\Support\Collection;
 
 /* 
     What i want ?
@@ -17,52 +16,72 @@ class Validator
 {
   protected $ret = [];
 
+  /**
+   * Strukturálja a validációs szabályokat
+   */
   private static function structure($rules)
   {
-    $ret = [];
-    foreach ($rules as $key => $rule) {
-      $ret[$key] = $rule;
-    }
-
-    return $ret;
+    return $rules; // Egyszerűsítve, mivel csak visszaadjuk ugyanazt
   }
 
 
+  /**
+   * Fő validációs metódus
+   */
   public static function validate($request, $rules)
   {
     $ret = [];
     $rules = static::structure($rules);
 
     foreach ($request as $req_key => $req_value) {
-      $req_value =  sanitize($req_value);
+      $req_value = sanitize($req_value);
       $validator = $rules[$req_key] ?? [];
-      foreach ($validator as  $val_value) {
-        if (strpos($val_value, ':')) {
-          $parts = explode(":", $val_value);
-
-          $validatorName = $parts[0];
-          $validatorValue = $parts[1];
-
-          $ret[$req_key][$validatorName] = [
-            "status" => static::$validatorName($req_value, $validatorValue),
-            'errorMessage' => !static::$validatorName($req_value, $validatorValue) ? static::errorMessages($validatorName, $validatorValue) : ''
-          ];
-        } else {
-          $ret[$req_key][$val_value] = [
-            "status" => static::$val_value($req_value),
-            'errorMessage' => !static::$val_value($req_value) ? static::errorMessages($val_value) : ''
-          ];
-        }
+      
+      foreach ($validator as $val_value) {
+        $validationResult = static::executeValidator($req_value, $val_value);
+        $ret[$req_key][$validationResult['name']] = $validationResult;
       }
     }
 
-
     $errors = static::errors($ret);
-    if (!empty($errors)) return ValidationException::throw($errors, $request);
+    if (!empty($errors)) {
+      return ValidationException::throw($errors, $request);
+    }
 
     return $request;
   }
 
+  /**
+   * Egyetlen validátor végrehajtása
+   */
+  private static function executeValidator($value, $rule)
+  {
+    if (strpos($rule, ':') !== false) {
+      $parts = explode(":", $rule, 2); // Limit 2-re a biztonság kedvéért
+      $validatorName = $parts[0];
+      $validatorValue = $parts[1];
+      
+      $status = static::$validatorName($value, $validatorValue);
+      
+      return [
+        'name' => $validatorName,
+        'status' => $status,
+        'errorMessage' => $status ? '' : static::errorMessages($validatorName, $validatorValue)
+      ];
+    } else {
+      $status = static::$rule($value);
+      
+      return [
+        'name' => $rule,
+        'status' => $status,
+        'errorMessage' => $status ? '' : static::errorMessages($rule)
+      ];
+    }
+  }
+
+  /**
+   * A sikertelen validációk hibáinak összegyűjtése
+   */
   public static function errors($ret)
   {
     $errors = [];
@@ -77,25 +96,45 @@ class Validator
     return $errors;
   }
 
+  // ================================
+  // VALIDÁCIÓS SZABÁLYOK
+  // ================================
+
+  /**
+   * Kötelező mező validáció
+   */
   protected static function required($value)
   {
-    if (!$value || $value === '') return true;
-    return true;
+    return !empty($value) && $value !== '' && $value !== null;
   }
+  /**
+   * Szöveg típus validáció
+   */
   protected static function string($value)
   {
-    return (bool)is_string($value);
-  }
-  protected static function min($value, $length)
-  {
-    return (int)strlen($value) >= $length;
-  }
-  protected static function max($value, $length)
-  {
-    return (int)strlen($value) <= $length;
+    return is_string($value);
   }
 
-  public static function password($value)
+  /**
+   * Minimális hossz validáció
+   */
+  protected static function min($value, $length)
+  {
+    return strlen($value) >= (int)$length;
+  }
+
+  /**
+   * Maximális hossz validáció
+   */
+  protected static function max($value, $length)
+  {
+    return strlen($value) <= (int)$length;
+  }
+
+  /**
+   * Jelszó erősség validáció
+   */
+  protected static function password($value)
   {
     $hasUpperCase = preg_match('/[A-Z]/', $value);
     $hasLowerCase = preg_match('/[a-z]/', $value);
@@ -106,12 +145,18 @@ class Validator
     return $hasUpperCase && $hasLowerCase && $hasNumber && $hasSpecialChar && $isLengthValid;
   }
 
-  public static function comparePw($password, $confirmPassword)
+  /**
+   * Jelszó egyezés validáció
+   */
+  protected static function comparePw($password, $confirmPassword)
   {
     return $password === $confirmPassword;
   }
 
-  public static function unique($value, $params)
+  /**
+   * Egyediség validáció adatbázisban
+   */
+  protected static function unique($value, $params)
   {
     $paramsArray = explode('|', $params);
 
@@ -119,53 +164,70 @@ class Validator
       throw new Exception("Hibás bemenet: a paraméterek nem megfelelőek.");
     }
 
-    $db = trim($paramsArray[1]); // Táblanév
     $record = trim($paramsArray[0]); // Oszlopnév
+    $db = trim($paramsArray[1]); // Táblanév
 
     $sql = "SELECT COUNT(*) as count FROM `$db` WHERE `$record` = :value";
-
     $result = (new Database)->query($sql, ["value" => $value])->get()[0];
 
     return (int)$result->count === 0;
   }
 
-  public static function phone($value)
+  /**
+   * Magyar telefonszám validáció
+   */
+  protected static function phone($value)
   {
     $cleanValue = preg_replace('/[\s\-]/', '', $value);
     $pattern = '/^(?:\+36|06)\d{9}$/';
 
-    return preg_match($pattern, $cleanValue);
+    return (bool)preg_match($pattern, $cleanValue);
   }
 
-  public static function email($value)
+  /**
+   * Email cím validáció
+   */
+  protected static function email($value)
   {
     return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
   }
 
-  public static function noSpaces($value)
+  /**
+   * Szóköz mentes validáció
+   */
+  protected static function noSpaces($value)
   {
-    if (strpos($value, ' ') !== false) return false;
-    return true;
+    return strpos($value, ' ') === false;
   }
 
-  public static function numeric($value)
+  /**
+   * Numerikus érték validáció
+   */
+  protected static function numeric($value)
   {
-    if (!is_numeric($value)) return false;
-    return true;
+    return is_numeric($value);
   }
 
-
-  public static function hasNum($value)
+  /**
+   * Szám tartalmazás validáció
+   */
+  protected static function hasNum($value)
   {
-    return preg_match('/\d/', $value);
+    return (bool)preg_match('/\d/', $value);
   }
 
-  public static function hasUppercase($value)
+  /**
+   * Nagybetű tartalmazás validáció
+   */
+  protected static function hasUppercase($value)
   {
-    return preg_match('/[A-Z]/', $value);
+    return (bool)preg_match('/[A-Z]/', $value);
   }
 
-  public static function split($value)
+  /**
+   * Legalább két szó validáció (teljes név)
+   */
+  protected static function split($value)
   {
     $words = explode(' ', trim($value));
     return count($words) >= 2 && strlen($words[1]) > 0;

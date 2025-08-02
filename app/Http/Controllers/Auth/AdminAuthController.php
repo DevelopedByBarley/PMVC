@@ -77,8 +77,7 @@ class AdminAuthController extends Controller
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    $this->auth::login('admin', $email);
-
+    // A login már megtörtént az attempt() metódusban, nem kell külön hívni
     return Navigator::redirect('/admin/dashboard');
   }
 

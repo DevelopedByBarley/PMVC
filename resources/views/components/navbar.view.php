@@ -19,13 +19,13 @@
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li>
               <form action="/lang" method="POST" class="d-inline">
-                <input type="hidden" name="lang" value="hu-Hu">
+                <input type="hidden" name="lang" value="hu">
                 <button type="submit" class="dropdown-item">Hu</button>
               </form>
             </li>
             <li>
               <form action="/lang" method="POST" class="d-inline">
-                <input type="hidden" name="lang" value="en-En">
+                <input type="hidden" name="lang" value="en">
                 <button type="submit" class="dropdown-item">En</button>
               </form>
             </li>

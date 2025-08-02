@@ -12,16 +12,19 @@ class Authenticator
       'email' => $email
     ])->find();
 
+    // Először ellenőrizzük, hogy létezik-e a user
+    if (!$user) {
+      return false;
+    }
 
-
+    // Ha email verification szükséges és nincs verificálva
     if ($verified && is_null($user->email_verified_at)) {
       return false;
-    };
+    }
 
-    if ($user) {
-      if (password_verify($password, $user->password)) {
-        return $user;
-      }
+    // Jelszó ellenőrzés
+    if (password_verify($password, $user->password)) {
+      return $user;
     }
 
     return false;
@@ -37,28 +40,38 @@ class Authenticator
       'email' => $email
     ])->find();
 
+    // Először ellenőrizzük, hogy létezik-e a user
+    if (!$user) {
+      return false;
+    }
 
-
+    // Ha email verification szükséges és nincs verificálva
     if ($verified && is_null($user->email_verified_at)) {
       return false;
-    };
+    }
 
-    if ($user) {
-      if (password_verify($password, $user->password)) {
-        $this->login(rtrim($table, 's'), $email);
-
-        return $user;
-      }
+    
+    // Jelszó ellenőrzés
+    if (password_verify($password, $user->password)) {
+      $this->login($user, $table); // Teljes user objektumot adjuk át
+      return $user;
     }
 
     return false;
   }
 
-  public static function login($entity, $email)
+  public static function login($user, $table = 'users')
   {
-    $_SESSION[$entity] = (object)[
-      'email' => $email
-    ];
+    // Session inicializálás ha még nincs
+    if (session_status() === PHP_SESSION_NONE) {
+      session_start();
+    }
+
+    // Entity név meghatározása (users -> user)
+    $entity = rtrim($table, 's');
+
+    // Teljes user objektum tárolása session-ben
+    $_SESSION[$entity] = $user;
 
     session_regenerate_id(true);
   }

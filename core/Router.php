@@ -4,6 +4,16 @@ namespace Core;
 
 use App\Http\Middlewares\Middleware;
 
+/**
+ * Router osztály - HTTP útvonalak kezelése
+ * 
+ * Támogatott funkciók:
+ * - RESTful route-ok
+ * - Resource route-ok
+ * - Middleware támogatás
+ * - CSRF védelem
+ * - Paraméterek kezelése
+ */
 class Router
 {
 	protected $routes = [];
@@ -17,163 +27,336 @@ class Router
 		'destroy' => ['DELETE', '/{id}'],
 	];
 	protected $exceptions = [];
+	protected $csrfProtectedMethods = ['POST', 'DELETE', 'PATCH', 'PUT'];
 
 
+	/**
+	 * Új route hozzáadása
+	 */
 	public function add($method, $uri, $controller)
 	{
 		$this->routes[] = [
-			'uri' => $uri,
+			'uri' => $this->normalizeUri($uri),
 			'controller' => $controller,
-			'method' => $method,
+			'method' => strtoupper($method),
 			'middleware' => null
 		];
 
 		return $this;
 	}
 
-	//$route->get(/${entity}, [Controller::class, $method]);
+	/**
+	 * URI normalizálása
+	 */
+	private function normalizeUri($uri)
+	{
+		return '/' . trim($uri, '/');
+	}
 
+	/**
+	 * Resource route-ok generálása
+	 * Használat: $router->resources('users', UserController::class)
+	 */
 	public function resources($uri, $controller, $middleware = null)
 	{
 		if (!class_exists($controller)) {
 			throw new \Exception("Controller '{$controller}' not found.");
 		}
 
-		foreach ($this->routes_of_resources as $action => [$method, $suffix]) {
-			if (!in_array($action, $this->exceptions)) {
-				$this->{strtolower($method)}("/{$uri}{$suffix}", [$controller, $action])->middleware($middleware);
+		$resourceRoutes = $this->getFilteredResourceRoutes();
+
+		foreach ($resourceRoutes as $action => [$method, $suffix]) {
+			$this->{strtolower($method)}("/{$uri}{$suffix}", [$controller, $action]);
+			
+			if ($middleware) {
+				$this->middleware($middleware);
 			}
 		}
 
-		$this->exceptions = [];
-
+		$this->resetExceptions();
 		return $this;
 	}
 
+	/**
+	 * Szűrt resource route-ok lekérése
+	 */
+	private function getFilteredResourceRoutes()
+	{
+		if (!empty($this->exceptions)) {
+			return array_diff_key($this->routes_of_resources, array_flip($this->exceptions));
+		}
+
+		return $this->routes_of_resources;
+	}
+
+	/**
+	 * Kivételek resetelése
+	 */
+	private function resetExceptions()
+	{
+		$this->exceptions = [];
+	}
+
+	/**
+	 * Resource route-okból kivételek megadása
+	 * Használat: $router->except(['create', 'edit'])->resources(...)
+	 */
 	public function except(array $exceptions)
 	{
 		$this->exceptions = $exceptions;
 		return $this;
 	}
-	public function just(array $exceptions)
+
+	/**
+	 * Csak megadott resource route-ok használata
+	 * Használat: $router->just(['index', 'show'])->resources(...)
+	 */
+	public function just(array $actions)
 	{
-
-		$exceptionKeys = array_flip($exceptions);
-		$this->routes_of_resources = array_intersect_key($this->routes_of_resources, $exceptionKeys);
-
+		$allActions = array_keys($this->routes_of_resources);
+		$this->exceptions = array_diff($allActions, $actions);
 		return $this;
 	}
 
+	// ================================
+	// HTTP METÓDUSOK
+	// ================================
 
-
-
+	/**
+	 * GET route
+	 */
 	public function get($uri, $controller)
 	{
 		return $this->add('GET', $uri, $controller);
 	}
 
+	/**
+	 * POST route
+	 */
 	public function post($uri, $controller)
 	{
 		return $this->add('POST', $uri, $controller);
 	}
 
+	/**
+	 * DELETE route
+	 */
 	public function delete($uri, $controller)
 	{
 		return $this->add('DELETE', $uri, $controller);
 	}
 
+	/**
+	 * PATCH route
+	 */
 	public function patch($uri, $controller)
 	{
 		return $this->add('PATCH', $uri, $controller);
 	}
 
+	/**
+	 * PUT route
+	 */
 	public function put($uri, $controller)
 	{
 		return $this->add('PUT', $uri, $controller);
 	}
 
+	/**
+	 * View route - közvetlenül view megjelenítésére
+	 */
 	public function view($uri, string $layout, string $root, array $params = [])
 	{
 		return $this->add('GET', $uri, function () use ($layout, $root, $params) {
 			echo view($layout, [
 				'root' => view($root, $params)
 			]);
-			return;
 		});
 	}
 
+	/**
+	 * Middleware hozzáadása az utolsó route-hoz
+	 */
 	public function middleware($key)
 	{
-		$this->routes[array_key_last($this->routes)]['middleware'] = $key;
+		if (empty($this->routes)) {
+			throw new \Exception("No routes defined to apply middleware to.");
+		}
+
+		$lastRouteIndex = array_key_last($this->routes);
+		$this->routes[$lastRouteIndex]['middleware'] = $key;
+		
+		return $this;
 	}
 
 
-	//$router->get('/admin/dashboard', [AdminController::class, 'index'])->only('admin');
+	// ================================
+	// ROUTE RESOLVING
+	// ================================
 
+	/**
+	 * Route feloldása és végrehajtása
+	 */
 	public function route($uri, $method)
 	{
-		// Csrf protected methods with config
-		$csrfProtectedMethods = ['POST', 'DELETE', 'PATCH', 'PUT'];
-		$csrf_config = require base_path('config/auth.php');
+		$uri = $this->normalizeUri($uri);
+		$method = strtoupper($method);
 
-		// Route iteration and check pattern
 		foreach ($this->routes as $route) {
-			$pattern = preg_replace('/\{id\}/', '(\d+)', $route['uri']);
-			// Az egyéb paraméterek továbbra is elfogadnak bármit
-			$pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '([^/]+)', $pattern);
-			$pattern = "#^" . $pattern . "$#";
-
-			// If pattern ok and $route method === $method
-			if (preg_match($pattern, $uri, $matches) && $route['method'] === strtoupper($method)) {
-				array_shift($matches);
-				// If we have middleware resolve that
-				if ($route['middleware']) {
-					if (is_array($route['middleware'])) {
-						foreach ($route['middleware'] as $middleware) {
-							Middleware::resolve($middleware);
-						}
-					} else {
-						Middleware::resolve($route['middleware']);
-					}
-				}
-
-				// if $route controller is callable, call that.
-				if (!is_array($route['controller']) && is_callable($route['controller'])) {
-					echo call_user_func_array($route['controller'], $matches);
-					exit();
-				}
-
-
-				if (is_array($route['controller'])) {
-					$controller = $route['controller'][0];
-					$fn = $route['controller'][1];
-					$method = $route['method'];
-
-
-					if (in_array(strtoupper($method), $csrfProtectedMethods) && $csrf_config['csrf']['protect']) {
-						//(new CSRF)->check();
-						Request::unset('csrf');
-						Request::unset('_method');
-					}
-					try {
-						(new $controller)->$fn($matches);
-					} finally {
-						Session::unflash();
-					}
-					exit();
-				}
+			if ($this->matchRoute($route, $uri, $method)) {
+				$params = $this->extractParameters($route['uri'], $uri);
+				$this->executeRoute($route, $params);
+				return;
 			}
 		}
 
 		$this->abort(404);
 	}
 
+	/**
+	 * Route egyezés ellenőrzése
+	 */
+	private function matchRoute($route, $uri, $method)
+	{
+		if ($route['method'] !== $method) {
+			return false;
+		}
+
+		$pattern = $this->buildRoutePattern($route['uri']);
+		return preg_match($pattern, $uri);
+	}
+
+	/**
+	 * Route pattern építése regex-hez
+	 */
+	private function buildRoutePattern($routeUri)
+	{
+		$pattern = preg_replace('/\{id\}/', '(\d+)', $routeUri);
+		$pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '([^/]+)', $pattern);
+		return "#^" . $pattern . "$#";
+	}
+
+	/**
+	 * Paraméterek kinyerése az URI-ból
+	 */
+	private function extractParameters($routeUri, $uri)
+	{
+		$pattern = $this->buildRoutePattern($routeUri);
+		preg_match($pattern, $uri, $matches);
+		array_shift($matches); // Első elem eltávolítása (teljes egyezés)
+		return $matches;
+	}
+
+	/**
+	 * Route végrehajtása
+	 */
+	private function executeRoute($route, $params)
+	{
+		try {
+			$this->handleMiddleware($route['middleware']);
+			$this->handleCsrfProtection($route['method']);
+			$this->callController($route['controller'], $params);
+		} finally {
+			Session::unflash();
+		}
+		
+		exit();
+	}
+
+	/**
+	 * Middleware kezelése
+	 */
+	private function handleMiddleware($middleware)
+	{
+		if (!$middleware) {
+			return;
+		}
+
+		if (is_array($middleware)) {
+			foreach ($middleware as $m) {
+				Middleware::resolve($m);
+			}
+		} else {
+			Middleware::resolve($middleware);
+		}
+	}
+
+	/**
+	 * CSRF védelem kezelése
+	 */
+	private function handleCsrfProtection($method)
+	{
+		if (!in_array($method, $this->csrfProtectedMethods)) {
+			return;
+		}
+
+		$csrf_config = require base_path('config/auth.php');
+		
+		if ($csrf_config['csrf']['protect']) {
+			// TODO: CSRF ellenőrzés implementálása
+			// (new CSRF)->check();
+			Request::unset('csrf');
+			Request::unset('_method');
+		}
+	}
+
+	/**
+	 * Controller meghívása
+	 */
+	private function callController($controller, $params)
+	{
+		// Callable function kezelése
+		if (!is_array($controller) && is_callable($controller)) {
+			echo call_user_func_array($controller, $params);
+			return;
+		}
+
+		// Controller osztály kezelése
+		if (is_array($controller)) {
+			[$controllerClass, $method] = $controller;
+			
+			if (!class_exists($controllerClass)) {
+				throw new \Exception("Controller '{$controllerClass}' not found.");
+			}
+
+			if (!method_exists($controllerClass, $method)) {
+				throw new \Exception("Method '{$method}' not found in controller '{$controllerClass}'.");
+			}
+
+			(new $controllerClass)->$method($params);
+			return;
+		}
+
+		throw new \Exception("Invalid controller format.");
+	}
+
+	/**
+	 * HTTP hiba válasz
+	 */
 	protected function abort($code = 404)
 	{
 		http_response_code($code);
-
 		require view_path("status/{$code}");
-
 		die();
+	}
+
+	// ================================
+	// DEBUG & UTILITY METÓDUSOK
+	// ================================
+
+	/**
+	 * Összes regisztrált route listázása (debug célra)
+	 */
+	public function getRoutes()
+	{
+		return $this->routes;
+	}
+
+	/**
+	 * Route-ok száma
+	 */
+	public function getRouteCount()
+	{
+		return count($this->routes);
 	}
 }

@@ -12,7 +12,7 @@
                 <p class="-50 mb-5">Please enter your email and password!</p>
 
                 <div data-mdb-input-init class="form-outline form-white mb-4">
-                  <input type="email" id="email" name="email" value="<?= old('email') ?>" class="form-control" />
+                  <input type="email" id="email" name="email" value="<?= old('email') ?>" class="form-control" data-validate="required|email|min:30" />
                   <label class="form-label" for="email">Email</label>
                   <?= errors('email', $errors) ?>
                 </div>

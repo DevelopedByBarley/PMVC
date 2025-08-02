@@ -90,10 +90,10 @@ class UserAuthController extends Controller
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    $email = sanitize($validated['email']) ?? null;
-    $password = sanitize($validated['password']) ?? null;
+    $email = $validated['email'] ?? null;
+    $password = $validated['password'] ?? null;
 
-    $authenticated = $this->auth->attempt($email, $password, 'users', true);
+    $authenticated = $this->auth->attempt($email, $password, 'users');
 
     if (!$authenticated) {
       Session::flash('old', $this->request->all());
@@ -137,7 +137,7 @@ class UserAuthController extends Controller
 
       $verify = new EmailVerify();
 
-      $verify->store($last_id, $token, $expires_at)->send($email, $based);
+      $verify->store($last_id, $token, $expires_at)->send($email, $password , $based);
 
 
       //$this->auth::login('user', $email);

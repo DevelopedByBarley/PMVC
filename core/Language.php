@@ -30,8 +30,9 @@ class Language
 
   public static function switch($lang)
   {
-    $lang = strtolower($lang); 
-    $allowed_langs = ['hu-hu', 'en-en', 'es-es'];
+    $lang = strtolower($lang);
+    $allowed_langs = ['hu', 'en', 'es'];
+
 
     if (!in_array($lang, $allowed_langs)) {
       die('Problem: ' . $lang . ' is not allowed langugage!');

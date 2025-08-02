@@ -1,219 +1,254 @@
 import { getCookie } from './cookie.js';
 
 /**
+ * Egyszerűsített validator használat
+ * 
  * @example
- *  
- *    <div class="form-outline">
- *        <label class="form-label" for="form3Example3">Email address</label>
- *        <input name="email" type="email" id="form3Example3" class="form-control" validators='{
- *           "name": "email",
- *            "required": true,
- *            "email": true,
- *            "minLength": 12,
- *            "maxLength": 50
- *        }' />
- *    </div>
+ * <!-- Alapvető használat -->
+ * <input name="email" type="email" data-validate="required|email" />
+ * 
+ * <!-- Paraméterekkel -->
+ * <input name="name" type="text" data-validate="required|min:3|max:50" />
+ * 
+ * <!-- Jelszó -->
+ * <input name="password" type="password" data-validate="required|password" />
+ * 
+ * <!-- Jelszó megerősítés -->
+ * <input name="password_confirm" type="password" data-validate="required|match:password" />
+ * 
+ * <!-- Telefonszám -->
+ * <input name="phone" type="tel" data-validate="required|phone" />
+ * 
+ * <!-- Csak számok -->
+ * <input name="age" type="number" data-validate="required|numeric|min:18|max:99" />
+ * 
+ * <!-- Teljes név -->
+ * <input name="full_name" type="text" data-validate="required|split" />
  */
 
 export function validator() {
+  console.log('Validator is running!');
 
-  console.log('Validator is already running!');
+  const lang = getCookie('lang') || 'hu';
 
-  const lang = getCookie('lang') ? getCookie('lang') : 'en';
+  // ================================
+  // HIBAÜZENETEK
+  // ================================
+  const messages = {
+    required: {
+      en: "This field is required.",
+      hu: "A mező kitöltése kötelező."
+    },
+    email: {
+      en: "Please enter a valid email address.",
+      hu: "Kérem adjon meg érvényes email címet."
+    },
+    min: {
+      en: (value) => `Minimum ${value} characters required.`,
+      hu: (value) => `Legalább ${value} karakter szükséges.`
+    },
+    max: {
+      en: (value) => `Maximum ${value} characters allowed.`,
+      hu: (value) => `Maximum ${value} karakter megengedett.`
+    },
+    numeric: {
+      en: "Only numbers are allowed.",
+      hu: "Csak számok megengedettek."
+    },
+    phone: {
+      en: "Please enter a valid phone number.",
+      hu: "Kérem adjon meg érvényes telefonszámot."
+    },
+    password: {
+      en: "Password must be at least 8 characters with uppercase, lowercase, number and special character.",
+      hu: "A jelszónak legalább 8 karakter hosszúnak kell lennie nagy- és kisbetűvel, számmal és speciális karakterrel."
+    },
+    match: {
+      en: "Passwords do not match.",
+      hu: "A jelszavak nem egyeznek."
+    },
+    split: {
+      en: "Please enter at least two words.",
+      hu: "Kérem adjon meg legalább két szót."
+    },
+    noSpaces: {
+      en: "Spaces are not allowed.",
+      hu: "Szóközök nem megengedettek."
+    }
+  };
 
+  // ================================
+  // VALIDÁTOR SZABÁLYOK
+  // ================================
+  const validators = {
+    required: (value) => value.trim().length > 0,
+    
+    email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()),
+    
+    min: (value, param) => value.trim().length >= parseInt(param),
+    
+    max: (value, param) => value.trim().length <= parseInt(param),
+    
+    numeric: (value) => /^\d+$/.test(value),
+    
+    phone: (value) => /^(?:\+36|06)\d{9}$/.test(value.replace(/[\s\-]/g, '')),
+    
+    password: (value) => {
+      const pwd = value.trim();
+      return pwd.length >= 8 && 
+             /[A-Z]/.test(pwd) && 
+             /[a-z]/.test(pwd) && 
+             /\d/.test(pwd) && 
+             /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+    },
+    
+    match: (value, param, element) => {
+      const matchElement = element.form.querySelector(`[name="${param}"]`);
+      return matchElement ? value === matchElement.value : false;
+    },
+    
+    split: (value) => {
+      const parts = value.trim().split(' ').filter(part => part.length > 0);
+      return parts.length >= 2;
+    },
+    
+    noSpaces: (value) => !value.includes(' ')
+  };
 
-  function checkValidators(options, inputValue, targetElement) {
-    let errors = [];
+  // ================================
+  // HELPER FÜGGVÉNYEK
+  // ================================
+  function getMessage(rule, param = null) {
+    const msg = messages[rule];
+    if (!msg) return "Validation error";
 
-    Object.keys(options).forEach(key => {
-      let value = options[key];
+    console.log(lang);
+    
+    console.log(msg[lang]);;
+    
+    
+    if (typeof msg[lang] === 'function') {
+      return msg[lang](param);
+    }
 
-      switch (key) {
-        case "required":
-          if (value === true) {
-            const requiredMessage = {
-              en: "This field is required.",
-              hu: "A mező kitöltése kötelező."
-            };
+    
+    return msg[lang] || msg.hu || msg.en || "Validation error";
+  }
 
-            if (inputValue.trim().length === 0) {
-              errors.push(requiredMessage[lang]);
-            }
-          }
-          break;
+  function parseValidationRules(rulesString) {
+    return rulesString.split('|').map(rule => {
+      const [name, param] = rule.split(':');
+      return { name: name.trim(), param: param?.trim() };
+    });
+  }
 
-        case "noSpaces":
-          if (value === true && inputValue.includes(" ")) {
-            errors.push("A mező értéke nem tartalmazhat szóközt!");
-          }
-          break;
+  function validateInput(element, rules) {
+    const value = element.value;
+    const errors = [];
 
-        case "num":
-          if (typeof value === "boolean" && value === true) {
-            // Csak akkor ad hibát, ha bármilyen nem szám karakter található
-            if (!/^\d+$/.test(inputValue)) {
-              errors.push("A mező értéke csak szám lehet!");
-            }
-          }
-          break;
-
-
-        case "minLength":
-          if (typeof value === 'number' && inputValue.trim().length < value) {
-            const minLengthMessage = {
-              en: `The length of the field cannot be less than ${value}`,
-              hu: `A mező hossza nem lehet kevesebb mint ${value}.`
-            };
-            errors.push(minLengthMessage[lang]);
-          }
-          break;
-
-        case "maxLength":
-          if (typeof value === 'number' && inputValue.trim().length > value) {
-            const maxLengthMessage = {
-              en: `The length of the field cannot be more than ${value}`,
-              hu: `A mező hossza nem lehet több mint ${value}.`
-            };
-            errors.push(maxLengthMessage[lang]);
-          }
-          break;
-
-        case "hasNum":
-          if (value === true && !/\d/.test(inputValue.trim())) {
-            errors.push("A mezőnek tartalmaznia kell legalább egy számot!");
-          }
-          break;
-
-        case "hasUppercase":
-          if (value === true && !/[A-Z]/.test(inputValue)) {
-            errors.push("A mezőnek tartalmaznia kell legalább egy nagybetűt!");
-          }
-          break;
-
-        case "split":
-          if (value === true) {
-            const nameParts = inputValue.split(" ");
-            if ((inputValue !== "" && nameParts.length < 2) || (nameParts.length >= 2 && nameParts[1].length === 0)) {
-              errors.push("Az mező értékének minimum 2 szóból kell állnia");
-            }
-          }
-          break;
-
-        case "password":
-          if (value === true) {
-            const passwordValue = inputValue.trim();
-            const hasUpperCase = /[A-Z]/.test(passwordValue);
-            const hasLowerCase = /[a-z]/.test(passwordValue);
-            const hasNumber = /\d/.test(passwordValue);
-            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(passwordValue);
-            const isLengthValid = passwordValue.length >= 8;
-
-            if (passwordValue === "") {
-              errors.push("Kérlek add meg a jelszavadat!");
-            }
-            if (!hasUpperCase) {
-              errors.push("A jelszónak tartalmaznia kell legalább egy nagybetűt!");
-            }
-            if (!hasLowerCase) {
-              errors.push("A jelszónak tartalmaznia kell legalább egy kisbetűt!");
-            }
-            if (!hasNumber) {
-              errors.push("A jelszónak tartalmaznia kell legalább egy számot!");
-            }
-            if (!hasSpecialChar) {
-              errors.push("A jelszónak tartalmaznia kell legalább egy speciális karaktert!");
-            }
-            if (!isLengthValid) {
-              errors.push("A jelszónak legalább 8 karakter hosszúnak kell lennie!");
-            }
-          }
-          break;
-
-        case "match":
-          if (value) {
-            const match = targetElement.parentElement.parentElement.querySelector(`[name="${value}"]`);
-
-
-            if (inputValue !== match.value && inputValue !== '') {
-              errors.push("A 2 jelszó nem megegyező!");
-            } else {
-              match.setCustomValidity("");
-              match.style.border = "2px solid lightgreen";
-              const alert = targetElement.parentElement.parentElement.querySelector(`#${value}-validator-alert`)
-              if (alert) {
-                alert.remove();
-              }
-
-            }
-          }
-          break;
-
-        case "email":
-          if (value === true) {
-            const emailMessage = {
-              en: "Please enter a valid e-mail address.",
-              hu: "Kérem adjon meg érvényes e-mail címet."
-            };
-            const emailValue = inputValue.trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            if (!emailRegex.test(emailValue)) {
-              errors.push(emailMessage[lang]);
-            }
-          }
-          break;
-
-        case "phone":
-          if (value === true) {
-            const phoneValue = inputValue.trim();
-            const phonePattern = /^(?:\+36|06)\d{9}$|^(?:\+36-\d{2}-\d{3}-\d{4})$/;
-            if (!phonePattern.test(phoneValue)) {
-              errors.push("A telefonszámnak a következő formátumok valamelyikét kell követnie: +36-30-551-1234, +36305511234, vagy 06305511234");
-            }
-          }
-          break;
-
-        default:
-          break;
+    rules.forEach(rule => {
+      if (validators[rule.name]) {
+        const isValid = validators[rule.name](value, rule.param, element);
+        if (!isValid) {
+          errors.push(getMessage(rule.name, rule.param));
+        }
       }
     });
-
-    // Set custom validity and border color based on errors
-    if (errors.length > 0) {
-      targetElement.setCustomValidity(errors[0]); // Set only the first error as custom validity
-      targetElement.style.border = "2px solid salmon";
-    } else {
-      targetElement.setCustomValidity(""); // Clear custom validity
-      targetElement.style.border = "2px solid lightgreen";
-    }
 
     return errors;
   }
 
-  const forms = document.querySelectorAll('form');
-  forms.forEach(form => {
-    let inputElements = form.querySelectorAll("[validators]");
+  function createErrorDisplay(element) {
+    const errorId = `${element.name}-errors`;
+    let errorDiv = document.getElementById(errorId);
+    
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.id = errorId;
+      errorDiv.className = 'validation-errors';
+      errorDiv.style.cssText = 'color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem;';
+      element.parentNode.insertBefore(errorDiv, element.nextSibling);
+    }
+    
+    return errorDiv;
+  }
 
-    inputElements.forEach(inputElement => {
-      let options = JSON.parse(inputElement.getAttribute("validators"));
-      let name = options.name;
-      let targetElement = inputElement.parentElement.querySelector(`[name="${name}"]`);
+  function updateValidationState(element, errors) {
+    const errorDiv = createErrorDisplay(element);
+    
+    // Clear previous errors
+    errorDiv.innerHTML = '';
+    
+    if (errors.length > 0) {
+      // Show errors
+      errorDiv.innerHTML = errors.map(error => `<div>${error}</div>`).join('');
+      element.style.borderColor = '#dc3545';
+      element.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+      element.setCustomValidity(errors[0]);
+    } else {
+      // No errors
+      element.style.borderColor = '#28a745';
+      element.style.boxShadow = '0 0 0 0.2rem rgba(40, 167, 69, 0.25)';
+      element.setCustomValidity('');
+    }
+  }
 
-      let inputAlert = document.createElement("div");
-      inputAlert.id = `${name}-validator-alert`;
-      inputAlert.style.color = "red";
-      inputAlert.style.marginTop = ".5rem";
-      targetElement.parentNode.insertBefore(inputAlert, inputElement.nextSibling);
+  // ================================
+  // INICIALIZÁLÁS
+  // ================================
+  const validateElements = document.querySelectorAll('[data-validate]');
+  
+  validateElements.forEach(element => {
+    const rulesString = element.getAttribute('data-validate');
+    const rules = parseValidationRules(rulesString);
+    
+    // Input esemény
+    element.addEventListener('input', () => {
+      const errors = validateInput(element, rules);
+      updateValidationState(element, errors);
+    });
+    
+    // Blur esemény (amikor elhagyja a mezőt)
+    element.addEventListener('blur', () => {
+      const errors = validateInput(element, rules);
+      updateValidationState(element, errors);
+    });
+    
+    // Match validáció speciális kezelése
+    rules.forEach(rule => {
+      if (rule.name === 'match' && rule.param) {
+        const matchElement = element.form.querySelector(`[name="${rule.param}"]`);
+        if (matchElement) {
+          matchElement.addEventListener('input', () => {
+            const errors = validateInput(element, rules);
+            updateValidationState(element, errors);
+          });
+        }
+      }
+    });
+  });
 
-      inputElement.addEventListener("input", function (e) {
-        let errors = checkValidators(options, e.target.value, targetElement);
-        inputAlert.innerHTML = ""; // Clear previous error messages
-        errors.forEach(error => {
-          let errorElement = document.createElement("div");
-          errorElement.textContent = error;
-          inputAlert.appendChild(errorElement);
-        });
+  // Form submit validáció
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', (e) => {
+      let hasErrors = false;
+      
+      form.querySelectorAll('[data-validate]').forEach(element => {
+        const rulesString = element.getAttribute('data-validate');
+        const rules = parseValidationRules(rulesString);
+        const errors = validateInput(element, rules);
+        
+        updateValidationState(element, errors);
+        
+        if (errors.length > 0) {
+          hasErrors = true;
+        }
       });
+      
+      if (hasErrors) {
+        e.preventDefault();
+        console.log('Form submission prevented due to validation errors');
+      }
     });
   });
 }
