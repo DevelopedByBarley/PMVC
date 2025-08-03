@@ -40,6 +40,7 @@ class UserAuthController extends Controller
   {
     $user =  Session::get('user');
 
+    
     echo view('components/layout', [
       'root' => view('auth/show', [
         'user' => $user,
@@ -115,7 +116,7 @@ class UserAuthController extends Controller
     } catch (ValidationException $exception) {
       Session::flash('errors', $exception->errors);
       Session::flash('old', $exception->old);
-      return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
+      return $this->toast->danger('Sikertelen regisztráció, kérjük próbálja meg más adatokkal!')->back();
     }
 
     $email = sanitize($validated['email']) ?? null;
@@ -123,7 +124,7 @@ class UserAuthController extends Controller
 
     $last_id = $this->User->create([
       'name' => $faker->name(),
-      'phone' => $faker->phoneNumber(),
+      'phone' => '06305541004',
       'email' => $email,
       'password' => password_hash($password, PASSWORD_DEFAULT)
     ]);
@@ -143,7 +144,13 @@ class UserAuthController extends Controller
       //$this->auth::login('user', $email);
       //this->mailer->prepare("arpadsz@max.hu", "Teszt")->template('test', ['email' => $email])->send();
 
-      $this->toast->success('Sikeres regisztráció, kérjük erősítse meg e-mail címére küldött levéllel a regisztrációját.')->back();
+      $this->toast->success('Sikeres regisztráció! Kérjük erősítse meg emailben kapott linket, hogy be tudjon lépni az oldalra.')
+        ->title('Regisztráció sikeres')
+        ->description('Az adatok sikeresen mentésre kerültek.')
+        ->position('bottom-0 end-0')
+        ->delay(3000)
+        ->icon('fas fa-check-circle')
+        ->back(); 
     }
   }
 

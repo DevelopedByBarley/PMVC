@@ -1,9 +1,11 @@
+@use "sass:map";
+
 .pr-bg {
-  background-color: map-get($colors, 'teal-500');
+  background-color: map.get($colors, 'teal-500');
 }
 
 .sc-bg {
-  background-color: map-get($colors, 'cyan-500');
+  background-color: map.get($colors, 'cyan-500');
 }
 
 .pr-font {
@@ -23,10 +25,10 @@ body {
 }
 
 .is-valid {
-  border-color: map-get($colors, 'green-500') !important;
+  border-color: map.get($colors, 'green-500') !important;
 }
 .is-invalid {
-  border-color: map-get($colors, 'red-500') !important;
+  border-color: map.get($colors, 'red-500') !important;
 }
 
 label.required, div.required {
@@ -73,21 +75,21 @@ label.required, div.required {
 [data-bs-theme=dark] {
   @each $name, $color in $colors {
     .dark-bg-#{$name} {
-      background-color: map-get($colors, $name) !important;
+      background-color: map.get($colors, $name) !important;
     }
 
     .dark-bg-hover-#{$name} {
       &:hover {
-        background-color: map-get($colors, $name) !important;
+        background-color: map.get($colors, $name) !important;
       }
     }
 
     .dark-text-#{$name} {
-      color: map-get($colors, $name) !important;
+      color: map.get($colors, $name) !important;
     }
 
     .dark-border-#{$name} {
-      border-color: map-get($colors, $name) !important;
+      border-color: map.get($colors, $name) !important;
     }
   }
 }
@@ -96,24 +98,24 @@ label.required, div.required {
 [data-bs-theme=light] {
   @each $name, $color in $colors {
     .light-bg-#{$name} {
-      background-color: map-get($colors, $name) !important;
+      background-color: map.get($colors, $name) !important;
     }
 
     .light-bg-hover-#{$name} {
       &:hover {
-        background-color: map-get($colors, $name) !important;
+        background-color: map.get($colors, $name) !important;
       }
 
     }
 
     .light-text-#{$name} {
-      color: map-get($colors, $name) !important;
+      color: map.get($colors, $name) !important;
     }
 
 
 
     .light-border-#{$name} {
-      border-color: map-get($colors, $name) !important;
+      border-color: map.get($colors, $name) !important;
     }
   }
 }

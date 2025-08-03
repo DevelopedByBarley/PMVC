@@ -1,5 +1,10 @@
 @import url("https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.4.0/font/bootstrap-icons.min.css");
-@import '_fonts'; 
-@import '_vars'; 
-@import '_nav'; 
-@import '_base' 
+
+// Import shared variables first
+@use 'vars' as *;
+
+// Then import other modules with access to variables
+@use 'fonts';
+@use 'nav';
+@use 'base';
+@use 'toast'; 

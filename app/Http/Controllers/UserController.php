@@ -23,7 +23,12 @@ class UserController extends Controller
     $user =  Session::get('user');
   
   
- 
+    $this->toast->success('Sikeres mentés!')
+      ->title('Adatok mentve')
+      ->description('Az adatok sikeresen mentésre kerültek.')
+      ->delay(3000)
+      ->icon('fas fa-check-circle')
+      ->show();
 
     return Response::view('auth/index', 'layout', [
       'user' => $user,

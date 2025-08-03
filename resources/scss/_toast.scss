@@ -1,0 +1,183 @@
+
+    // Toast Variables
+$toast-min-width: 300px;
+$toast-max-width: 400px;
+$toast-border-radius: 0.5rem;
+$toast-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+$toast-backdrop-blur: blur(10px);
+$animation-duration: 0.3s;
+$animation-easing: ease-out;
+
+// Toast Container
+.toast-container {
+  z-index: 1080;
+  
+  .toast {
+    min-width: $toast-min-width;
+    max-width: $toast-max-width;
+    backdrop-filter: $toast-backdrop-blur;
+    border-radius: $toast-border-radius;
+    box-shadow: $toast-shadow;
+    border: none;
+    overflow: hidden;
+    animation: slideIn $animation-duration $animation-easing;
+    
+    // Toast Header Styles
+    .toast-header {
+      border: none;
+      border-radius: $toast-border-radius $toast-border-radius 0 0;
+      background: linear-gradient(135deg, var(--bs-primary), var(--bs-primary-dark, #0056b3)) !important;
+      
+      .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.8;
+        
+        &:hover {
+          opacity: 1;
+        }
+      }
+      
+      strong {
+        font-weight: 600;
+      }
+      
+      small {
+        opacity: 0.8;
+      }
+    }
+    
+    // Toast Body Styles
+    .toast-body {
+      border-radius: 0 0 $toast-border-radius $toast-border-radius;
+      
+      .border-top {
+        border-color: rgba(0, 0, 0, 0.1) !important;
+      }
+    }
+    
+    // Type-specific header backgrounds
+    &.bg-success .toast-header {
+      background: linear-gradient(135deg, var(--bs-success), #157347) !important;
+    }
+    
+    &.bg-danger .toast-header {
+      background: linear-gradient(135deg, var(--bs-danger), #b02a37) !important;
+    }
+    
+    &.bg-warning .toast-header {
+      background: linear-gradient(135deg, var(--bs-warning), #997404) !important;
+      color: #000 !important;
+      
+      .btn-close {
+        filter: brightness(0);
+      }
+    }
+    
+    &.bg-info .toast-header {
+      background: linear-gradient(135deg, var(--bs-info), #087990) !important;
+    }
+  }
+  
+  // Position-specific animations
+  &.top-0.start-0 .toast {
+    animation: slideInLeft $animation-duration $animation-easing;
+  }
+  
+  &.bottom-0 .toast {
+    animation: slideInUp $animation-duration $animation-easing;
+  }
+  
+  &.start-50 .toast {
+    animation: slideInDown $animation-duration $animation-easing;
+  }
+}
+
+// Animations
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 576px) {
+  .toast-container {
+    .toast {
+      min-width: 280px;
+      max-width: 90vw;
+      margin: 0 1rem;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .toast {
+    .toast-body {
+      background-color: #2d2d2d !important;
+      color: #fff !important;
+      
+      .text-muted {
+        color: #adb5bd !important;
+      }
+      
+      .border-top {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+      }
+    }
+  }
+}
+
+// Hover effects
+.toast {
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+// Multiple toast stacking
+.toast-container {
+  .toast + .toast {
+    margin-top: 0.75rem;
+  }
+}
