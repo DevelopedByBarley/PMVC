@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use Core\Navigator;
+use Core\Response;
 use Core\Session;
 use Core\ValidationException;
 
@@ -28,11 +29,14 @@ class AdminAuthController extends Controller
 
   public function index()
   {
-    echo view('components/admin-layout', [
+    return Response::view('admin/index', 'admin-layout', [
+      "paginated" => []
+    ]);
+  /*   echo view('components/admin-layout', [
       'root' => view('admin/index', [
         "paginated" => []
       ])
-    ]);
+    ]); */
   }
   public function create()
   {
@@ -41,10 +45,8 @@ class AdminAuthController extends Controller
       return Navigator::redirect('/admin/dashboard');
     }
 
-    echo view('components/admin-layout', [
-      'root' => view('admin/create', [
-        "errors" => Session::get('errors') ?? []
-      ])
+    return Response::view('admin/create', 'admin-layout', [
+      "errors" => Session::get('errors') ?? []
     ]);
   }
 

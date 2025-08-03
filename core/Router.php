@@ -168,9 +168,7 @@ class Router
 	public function view($uri, string $layout, string $root, array $params = [])
 	{
 		return $this->add('GET', $uri, function () use ($layout, $root, $params) {
-			echo view($layout, [
-				'root' => view($root, $params)
-			]);
+			return Response::view($root, $layout, $params);
 		});
 	}
 
@@ -294,7 +292,7 @@ class Router
 		
 		if ($csrf_config['csrf']['protect']) {
 			// TODO: CSRF ellenőrzés implementálása
-			// (new CSRF)->check();
+			(new CSRF)->check();
 			Request::unset('csrf');
 			Request::unset('_method');
 		}

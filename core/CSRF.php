@@ -8,14 +8,12 @@ class CSRF
   private $lifeTime;
   private $token = '';
   public $tokens = [];
-  private $request;
 
   public function __construct()
   {
     $config = require base_path('config/auth.php');
     $this->secret = $config['csrf']['secret'];
     $this->lifeTime = $config['csrf']['lifetime'];
-    $this->request = new Request();
   }
 
   public function generate()
@@ -40,7 +38,7 @@ class CSRF
 
   public function check()
   {
-    $post_csrf = $this->request->key('csrf');
+    $post_csrf = request('csrf');
     $session_csrf_arr = Session::get('csrf');
 
     if (!isset($post_csrf)) {

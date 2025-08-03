@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Core\Response;
 use Core\Session;
 
 class UserController extends Controller
@@ -22,13 +23,19 @@ class UserController extends Controller
     $user =  Session::get('user');
     $users = $this->User->all(true, $search, ['name', 'email', 'created_at']);
 
-    echo view('components/user-layout', [
+    return Response::view('auth/index', 'layout', [
+      'user' => $user,
+      'paginated' => $users,
+      'search' => $search
+    ]);
+
+   /*  echo view('components/user-layout', [
       'root' => view('user/index', [
         'title' => 'Üdvözöljük',
         'paginated' => $users,
         'user' => $user
       ])
-    ]);
+    ]); */
   }
 
   public function show()

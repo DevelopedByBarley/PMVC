@@ -12,6 +12,9 @@ class Request
 
   public static function key($key)
   {
+    if(!$key || !isset($_POST[$key]) || empty($_POST[$key])) {
+      return null;
+    }
     return $_POST[$key];
   }
 

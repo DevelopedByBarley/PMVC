@@ -13,7 +13,7 @@ class Session
   }
 
 
-  public function has($key)
+  public static function has($key)
   {
     return (bool)static::get($key);
   }

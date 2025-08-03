@@ -1,7 +1,9 @@
 <?php
 
 use Core\Cookie;
+use Core\Response;
 use Core\Session;
+use Core\Template;
 
 function session($entity)
 {
@@ -52,30 +54,50 @@ function base_path($path)
   return BASE_PATH . $path;
 }
 
-function view($path, $params = [])
+function view($path, $root = '', $params = [], $engine = false): string
 {
-  ob_start();
+  // Ha $root üres string, akkor nem adunk hozzá semmit
 
-  extract($params);
+  if (!empty($root)) {
+    $full_root_path = 'components/' . $root;
+    $params = array_merge(['root' => $full_root_path], $params);
+  }
 
+  static $viewCache = [];
+
+  $cacheKey = $path . md5(json_encode($params)) . ($engine ? '_engine' : '_regular');
+  if (isset($viewCache[$cacheKey])) {
+    return $viewCache[$cacheKey];
+  }
+
+  // Ellenőrizzük, hogy létezik-e a template fájl
   $filePath = base_path('resources/views/' . $path . '.view.php');
-
   if (!file_exists($filePath)) {
-    echo 'This file is doesnt exist!';
     throw new \Exception("View file not found: " . $filePath);
   }
 
-  require $filePath;
+  $output = '';
 
-
-
-  $output = ob_get_clean();
+  if ($engine) {
+    // Template Engine használata
+    if (!class_exists('Template')) {
+      require_once base_path('core/Template.php');
+    }
+    Template::init();
+    $output = Template::render($path, $params);
+  } else {
+    // Hagyományos PHP renderelés
+    ob_start();
+    extract($params);
+    require $filePath;
+    $output = ob_get_clean();
+  }
 
   if (!headers_sent()) {
     header("Content-Type: text/html; charset=UTF-8");
   }
 
-  return $output;
+  return $viewCache[$cacheKey] = $output;
 }
 
 function old($key, $default = '')
@@ -232,4 +254,24 @@ function getWeekRange($events)
   }
 
   return $events;
+}
+
+
+function config($file = null)
+{
+  if ($file) {
+    $config = require base_path('config/' . $file . '.php');
+    return $config;
+  }
+}
+
+function request($key = null, $default = null) 
+{
+  $data = array_merge($_GET, $_POST);
+  
+  if ($key === null) {
+    return $data;
+  }
+  
+  return $data[$key] ?? $default;
 }

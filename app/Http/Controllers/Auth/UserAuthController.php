@@ -7,6 +7,7 @@ use App\Models\User;
 use Core\EmailVerify;
 use Core\Faker;
 use Core\Navigator;
+use Core\Response;
 use Core\Session;
 use Core\Storage;
 use Core\Token;
@@ -54,10 +55,9 @@ class UserAuthController extends Controller
       return Navigator::redirect('/user');
     }
 
-    echo view('components/layout', [
-      'root' => view('auth/create', [
-        "errors" => Session::get('errors') ?? []
-      ])
+    return Response::view('auth/create', 'layout', [
+      "errors" => Session::get('errors') ?? [],
+      'test' => 'test value'
     ]);
   }
 
@@ -67,10 +67,10 @@ class UserAuthController extends Controller
     if (Session::get('user')) {
       return Navigator::redirect('/user');
     }
-    echo view('components/layout', [
-      'root' => view('auth/store', [
-        "errors" => Session::get('errors') ?? []
-      ])
+    
+    Response::view('auth/store', 'layout', [
+      "errors" => Session::get('errors') ?? [],
+      'old' => Session::get('old') ?? []
     ]);
   }
 

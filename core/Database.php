@@ -10,11 +10,11 @@ class Database
 {
     use Singleton;
 
-    public $connection;
+    public PDO $connection;
     public $statement;
-    private $query = '';
-    private $redirected = false;
-    private $paginator;
+    private string $query = '';
+    private array $bindings = [];
+    private Paginator $paginator;
 
     public function __construct()
     {
@@ -29,7 +29,7 @@ class Database
             ]);
         } catch (PDOException $e) {
             Log::critical('Database connection fail!', 'Fail in Database class construct function with message:' . $e->getMessage());
-            dd($e->getMessage());
+            throw new Exception('Database connection failed: ' . $e->getMessage());
         }
     }
 
@@ -39,29 +39,124 @@ class Database
      * @param string $query The SQL query string.
      * @return self The current instance for method chaining.
      */
-    public function prepare($query)
+    public function prepare(string $query): self
     {
         $this->query = $query;
+        $this->bindings = [];
         return $this;
     }
 
     /**
-     * Adds a LEFT JOIN clause to the current SQL query and returns the current instance for method chaining.
+     * Generic join method for all join types
      *
-     * @param string $table The table to join.
-     * @param string $first_column The first column for the join condition.
-     * @param string $operator The operator used in the join condition.
-     * @param string $second_column The second column for the join condition.
-     * @return self The current instance for method chaining.
+     * @param string $type The join type (INNER, LEFT, RIGHT, FULL OUTER)
+     * @param string $table The table to join
+     * @param mixed $conditions String for simple condition or array for complex conditions
+     * @return self
      */
-    public function leftJoin($table, $conditions)
+    public function join(string $type, string $table, $conditions): self
     {
-        $onClause = [];
-        foreach ($conditions as $condition) {
-            $onClause[] = "{$condition[0]} {$condition[1]} {$condition[2]}";
+        $joinClause = " {$type} JOIN {$table} ON ";
+        
+        if (is_string($conditions)) {
+            // Simple string condition: "users.id = posts.user_id"
+            $joinClause .= $conditions;
+        } elseif (is_array($conditions)) {
+            if (isset($conditions[0]) && is_array($conditions[0])) {
+                // Multiple conditions: [['users.id', '=', 'posts.user_id'], ['users.status', '=', "'active'"]]
+                $onClause = [];
+                foreach ($conditions as $condition) {
+                    if (count($condition) === 3) {
+                        $onClause[] = "{$condition[0]} {$condition[1]} {$condition[2]}";
+                    }
+                }
+                $joinClause .= implode(' AND ', $onClause);
+            } else {
+                // Single condition array: ['users.id', '=', 'posts.user_id']
+                if (count($conditions) === 3) {
+                    $joinClause .= "{$conditions[0]} {$conditions[1]} {$conditions[2]}";
+                }
+            }
         }
-        $this->query .= " LEFT JOIN $table ON " . implode(' AND ', $onClause);
+        
+        $this->query .= $joinClause;
         return $this;
+    }
+
+    /**
+     * INNER JOIN
+     */
+    public function innerJoin(string $table, $conditions): self
+    {
+        return $this->join('INNER', $table, $conditions);
+    }
+
+    /**
+     * LEFT JOIN - Updated to use the new generic join method
+     */
+    public function leftJoin(string $table, $conditions): self
+    {
+        return $this->join('LEFT', $table, $conditions);
+    }
+
+    /**
+     * RIGHT JOIN
+     */
+    public function rightJoin(string $table, $conditions): self
+    {
+        return $this->join('RIGHT', $table, $conditions);
+    }
+
+    /**
+     * FULL OUTER JOIN
+     */
+    public function fullOuterJoin(string $table, $conditions): self
+    {
+        return $this->join('FULL OUTER', $table, $conditions);
+    }
+
+    /**
+     * CROSS JOIN
+     */
+    public function crossJoin(string $table): self
+    {
+        $this->query .= " CROSS JOIN {$table}";
+        return $this;
+    }
+
+    /**
+     * Advanced join with custom join conditions and WHERE-like syntax
+     *
+     * @param string $type Join type
+     * @param string $table Table to join
+     * @param callable $callback Callback function to build complex join conditions
+     * @return self
+     */
+    public function joinWhere(string $type, string $table, callable $callback): self
+    {
+        $joinBuilder = new JoinBuilder();
+        $callback($joinBuilder);
+        
+        $this->query .= " {$type} JOIN {$table} ON " . $joinBuilder->toSql();
+        $this->bindings = array_merge($this->bindings, $joinBuilder->getBindings());
+        
+        return $this;
+    }
+
+    /**
+     * LEFT JOIN with advanced conditions
+     */
+    public function leftJoinWhere(string $table, callable $callback): self
+    {
+        return $this->joinWhere('LEFT', $table, $callback);
+    }
+
+    /**
+     * INNER JOIN with advanced conditions
+     */
+    public function innerJoinWhere(string $table, callable $callback): self
+    {
+        return $this->joinWhere('INNER', $table, $callback);
     }
 
     /**
@@ -72,42 +167,39 @@ class Database
      * @param mixed $value The value to compare the column against.
      * @return self The current instance for method chaining.
      */
-    public function where($column, $operator, $value)
+    public function where(string $column, string $operator, $value): self
     {
+        $placeholder = ':where_' . count($this->bindings);
+        
         if (stripos($this->query, 'WHERE') === false) {
-            $this->query .= " WHERE $column $operator $value";
+            $this->query .= " WHERE $column $operator $placeholder";
         } else {
-            $this->query .= " AND $column $operator $value";
+            $this->query .= " AND $column $operator $placeholder";
         }
-
+        
+        $this->bindings[$placeholder] = $value;
         return $this;
     }
 
-    public function whereNotNull($column)
+    public function whereNotNull(string $column): self
     {
         if (stripos($this->query, 'WHERE') === false) {
             $this->query .= " WHERE $column IS NOT NULL";
         } else {
             $this->query .= " AND $column IS NOT NULL";
         }
-
         return $this;
     }
 
-
-
-    public function whereNull($column)
+    public function whereNull(string $column): self
     {
         if (stripos($this->query, 'WHERE') === false) {
             $this->query .= " WHERE $column IS NULL";
         } else {
             $this->query .= " AND $column IS NULL";
         }
-
         return $this;
     }
-
-
 
     /**
      * Executes the current SQL query with the provided parameters.
@@ -115,15 +207,16 @@ class Database
      * @param array $params The parameters to bind to the query.
      * @return self The current instance for method chaining.
      */
-    public function execute($params = [])
+    public function execute(array $params = []): self
     {
         try {
             $this->statement = $this->connection->prepare($this->query);
-            $this->statement->execute($params);
+            $allParams = array_merge($this->bindings, $params);
+            $this->statement->execute($allParams);
             return $this;
         } catch (PDOException $e) {
             Log::critical('Database fail in execute method', 'Fail in Database class execute function with message:' . $e->getMessage());
-            dd($e->getMessage());
+            throw new Exception('Query execution failed: ' . $e->getMessage());
         }
     }
 
@@ -135,7 +228,7 @@ class Database
      * @return self The current instance for method chaining.
      * @throws DatabaseException If a database error occurs.
      */
-    public function query($query, $params = [])
+    public function query(string $query, array $params = []): self
     {
         try {
             $this->statement = $this->connection->prepare($query);
@@ -143,11 +236,11 @@ class Database
             return $this;
         } catch (PDOException $e) {
             Log::critical('Database fail in query method', 'Fail in Database class query function with message:' . $e->getMessage());
-            dd($e->getMessage());
+            throw new Exception('Query execution failed: ' . $e->getMessage());
         }
     }
 
-    public function getLastInsertedId()
+    public function getLastInsertedId(): string
     {
         return $this->connection->lastInsertId();
     }
@@ -158,7 +251,7 @@ class Database
      * @param int $ret_type The fetch mode (default is PDO::FETCH_OBJ).
      * @return array The fetched results.
      */
-    public function get($ret_type = PDO::FETCH_OBJ)
+    public function get(int $ret_type = PDO::FETCH_OBJ): array
     {
         return $this->statement->fetchAll($ret_type);
     }
@@ -169,7 +262,7 @@ class Database
      * @param int $ret_type The fetch mode (default is PDO::FETCH_OBJ).
      * @return mixed The fetched result.
      */
-    public function find($ret_type = PDO::FETCH_OBJ)
+    public function find(int $ret_type = PDO::FETCH_OBJ)
     {
         return $this->statement->fetch($ret_type);
     }
@@ -181,7 +274,7 @@ class Database
      * @return mixed The fetched result.
      * @throws DatabaseException If no result is found.
      */
-    public function findOrFail($ret_type = PDO::FETCH_OBJ)
+    public function findOrFail(int $ret_type = PDO::FETCH_OBJ)
     {
         $result = $this->find($ret_type);
 
@@ -197,85 +290,20 @@ class Database
      *
      * @return string The current SQL query.
      */
-    public function debug()
+    public function debug(): string
     {
         return $this->query;
     }
 
-    public function selectCount($table)
+    public function selectCount(string $table): self
     {
-        $this->statement = $this->prepare("SELECT COUNT(*) AS count FROM $table");
+        $this->prepare("SELECT COUNT(*) AS count FROM $table");
         return $this;
     }
 
-    public function paginate($limit = 25, $search = [], $search_columns = [])
+    public function paginate(int $limit = 25, array $search = [], array $search_columns = [])
     {
         $data = $this->statement->fetchAll(PDO::FETCH_OBJ);
         return $this->paginator->data($data)->filter($search, $search_columns)->paginate($limit);
     }
-
-    /*   public function paginate($itemsPerPage = 10, $currentPage = null, $search = [], $search_columns = [])
-    {
-        try {
-            $currentPage = $currentPage ?? ($_GET['offset'] ?? 1);
-            $currentPage = max((int)$currentPage, 1);
-
-            $searchCondition = '';
-            $searchParams = [];
-
-            if (is_string($search) && !empty($search_columns)) {
-                $searchParts = [];
-                foreach ($search_columns as $column) {
-                    $searchParts[] = "$column LIKE :search";
-                }
-                $searchCondition = ' WHERE ' . implode(' OR ', $searchParts);
-                $searchParams[':search'] = "%$search%";
-            }
-
-            if (is_array($search) && !empty($search)) {
-                $searchParts = [];
-                foreach ($search as $key => $value) {
-                    if (in_array($key, $search_columns) && !empty($value)) {
-                        $searchParts[] = "$key LIKE :$key";
-                        $searchParams[":$key"] = "%$value%";
-                    }
-                }
-
-                if (!empty($searchParts)) {
-                    $searchCondition = ' WHERE ' . implode(' AND ', $searchParts);
-                }
-            }
-
-            $countQuery = preg_replace('/SELECT .*? FROM/', 'SELECT COUNT(*) as total FROM', $this->query, 1) . $searchCondition;
-            $paginatedQuery = $this->query . $searchCondition . " LIMIT :limit OFFSET :offset";
-
-            $countStmt = $this->connection->prepare($countQuery);
-            foreach ($searchParams as $param => $value) {
-                $countStmt->bindValue($param, $value, PDO::PARAM_STR);
-            }
-            $countStmt->execute();
-            $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
-
-            $totalPages = (int)ceil($totalRecords / $itemsPerPage);
-            $offset = ($currentPage - 1) * $itemsPerPage;
-
-            $this->statement = $this->connection->prepare($paginatedQuery);
-            foreach ($searchParams as $param => $value) {
-                $this->statement->bindValue($param, $value, PDO::PARAM_STR);
-            }
-            $this->statement->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
-            $this->statement->bindValue(':offset', $offset, PDO::PARAM_INT);
-            $this->statement->execute();
-
-            return (object)[
-                'data' => (object)$this->statement->fetchAll(PDO::FETCH_OBJ),
-                'total_records' => $totalRecords,
-                'total_pages' => $totalPages,
-                'current_page' => $currentPage,
-                'items_per_page' => $itemsPerPage,
-            ];
-        } catch (Exception $e) {
-            dd("Pagination query failed: " . $e->getMessage());
-        }
-    } */
 }
