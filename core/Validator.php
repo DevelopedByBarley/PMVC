@@ -168,7 +168,7 @@ class Validator
     $db = trim($paramsArray[1]); // Táblanév
 
     $sql = "SELECT COUNT(*) as count FROM `$db` WHERE `$record` = :value";
-    $result = (new Database)->query($sql, ["value" => $value])->get()[0];
+    $result = (Database::getInstance())->query($sql, ["value" => $value])->get()[0];
 
     return (int)$result->count === 0;
   }

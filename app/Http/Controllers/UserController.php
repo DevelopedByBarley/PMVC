@@ -21,11 +21,12 @@ class UserController extends Controller
   {
     $search = $_GET['search'] ?? '';
     $user =  Session::get('user');
-    $users = $this->User->all(true, $search, ['name', 'email', 'created_at']);
+  
+  
+ 
 
     return Response::view('auth/index', 'layout', [
       'user' => $user,
-      'paginated' => $users,
       'search' => $search
     ]);
 

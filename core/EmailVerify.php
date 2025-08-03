@@ -58,7 +58,7 @@ class EmailVerify
 
   public function token($user_id)
   {
-    return $this->db->query("SELECT token, expires_at FROM verification_tokens WHERE user_id = :user_id", [':user_id' => $user_id])->findOrFail();
+    return $this->db->query("SELECT token, expires_at FROM verification_tokens WHERE user_id = :user_id", [':user_id' => $user_id])->find();
   }
 
   public function deleteVerificationToken($user_id)

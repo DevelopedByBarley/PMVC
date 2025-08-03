@@ -23,7 +23,7 @@ class Model
   }
 
 
-  public function all($withPaginate = false, $search = '' || [], $search_columns = [])
+  public function all($withPaginate = false, $search = [], $search_columns = [])
   {
     try {
       return !$withPaginate
@@ -65,6 +65,14 @@ class Model
     return $this->updateTable($this->table, $data, $condition, $exceptions);
   }
 
+  /**
+   * Alternative update method with ID
+   */
+  public function updateById($id, array $data, array $exceptions = [])
+  {
+    return $this->updateTable($this->table, $data, "id = $id", $exceptions);
+  }
+
   public function insertIntoTable($table, $data, $exceptions = [])
   {
     try {
@@ -93,9 +101,19 @@ class Model
       }
 
       $set = implode(", ", array_map(fn($key) => "$key = :$key", array_keys($filteredData)));
-      $sql = "UPDATE $table SET $set WHERE $condition";
+      
+      // Check if condition contains placeholders or raw SQL
+      if (strpos($condition, ':') !== false || strpos($condition, '=') !== false) {
+        // Raw condition like "id = 123" or with placeholders
+        $sql = "UPDATE $table SET $set WHERE $condition";
+        $params = $filteredData;
+      } else {
+        // Simple condition like just "123" - assume it's an ID
+        $sql = "UPDATE $table SET $set WHERE id = :condition_id";
+        $params = array_merge($filteredData, ['condition_id' => $condition]);
+      }
 
-      return $this->db->query($sql, $filteredData);
+      return $this->db->query($sql, $params);
     } catch (Exception $e) {
       Log::critical("Database update error in Model.", "Database error: " . $e->getMessage());
       return false;
@@ -109,6 +127,197 @@ class Model
     } catch (Exception $e) {
       Log::critical("Database destroy error in Model.", "Database error: " . $e->getMessage());
       return false;
+    }
+  }
+
+  /**
+   * Find records by specific column and value
+   */
+  public function findBy(string $column, $value)
+  {
+    try {
+      return $this->db->query("SELECT * FROM $this->table WHERE $column = :value", ['value' => $value])->get();
+    } catch (Exception $e) {
+      Log::critical("Database findBy error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Find first record by specific column and value
+   */
+  public function findOneBy(string $column, $value)
+  {
+    try {
+      return $this->db->query("SELECT * FROM $this->table WHERE $column = :value", ['value' => $value])->find();
+    } catch (Exception $e) {
+      Log::critical("Database findOneBy error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Count all records in the table
+   */
+  public function count(): int
+  {
+    try {
+      $result = $this->db->query("SELECT COUNT(*) as count FROM $this->table")->find();
+      return $result ? (int)$result->count : 0;
+    } catch (Exception $e) {
+      Log::critical("Database count error in Model.", "Database error: " . $e->getMessage());
+      return 0;
+    }
+  }
+
+  /**
+   * Check if record exists by ID
+   */
+  public function exists($id): bool
+  {
+    try {
+      $result = $this->db->query("SELECT 1 FROM $this->table WHERE id = :id LIMIT 1", ['id' => $id])->find();
+      return !empty($result);
+    } catch (Exception $e) {
+      Log::critical("Database exists error in Model.", "Database error: " . $e->getMessage());
+      return false;
+    }
+  }
+
+  /**
+   * Get records with custom WHERE conditions
+   */
+  public function where(array $conditions = [])
+  {
+    try {
+      if (empty($conditions)) {
+        return $this->all();
+      }
+
+      $whereClause = [];
+      $params = [];
+      
+      foreach ($conditions as $column => $value) {
+        $whereClause[] = "$column = :$column";
+        $params[$column] = $value;
+      }
+      
+      $sql = "SELECT * FROM $this->table WHERE " . implode(' AND ', $whereClause);
+      return $this->db->query($sql, $params)->get();
+    } catch (Exception $e) {
+      Log::critical("Database where error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Get records with ORDER BY clause
+   */
+  public function orderBy(string $column, string $direction = 'ASC')
+  {
+    try {
+      $direction = strtoupper($direction);
+      if (!in_array($direction, ['ASC', 'DESC'])) {
+        $direction = 'ASC';
+      }
+      
+      return $this->db->query("SELECT * FROM $this->table ORDER BY $column $direction")->get();
+    } catch (Exception $e) {
+      Log::critical("Database orderBy error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Get records with LIMIT
+   */
+  public function limit(int $limit, int $offset = 0)
+  {
+    try {
+      return $this->db->query("SELECT * FROM $this->table LIMIT $limit OFFSET $offset")->get();
+    } catch (Exception $e) {
+      Log::critical("Database limit error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Get first record
+   */
+  public function first()
+  {
+    try {
+      return $this->db->query("SELECT * FROM $this->table LIMIT 1")->find();
+    } catch (Exception $e) {
+      Log::critical("Database first error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Get last record (assumes id column exists)
+   */
+  public function last()
+  {
+    try {
+      return $this->db->query("SELECT * FROM $this->table ORDER BY id DESC LIMIT 1")->find();
+    } catch (Exception $e) {
+      Log::critical("Database last error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Soft delete (assumes deleted_at column exists)
+   */
+  public function softDelete($id)
+  {
+    try {
+      $data = ['deleted_at' => date('Y-m-d H:i:s')];
+      return $this->db->query("UPDATE $this->table SET deleted_at = :deleted_at WHERE id = :id", 
+        array_merge($data, ['id' => $id]));
+    } catch (Exception $e) {
+      Log::critical("Database softDelete error in Model.", "Database error: " . $e->getMessage());
+      return false;
+    }
+  }
+
+  /**
+   * Restore soft deleted record
+   */
+  public function restore($id)
+  {
+    try {
+      return $this->db->query("UPDATE $this->table SET deleted_at = NULL WHERE id = :id", ['id' => $id]);
+    } catch (Exception $e) {
+      Log::critical("Database restore error in Model.", "Database error: " . $e->getMessage());
+      return false;
+    }
+  }
+
+  /**
+   * Get only non-deleted records (if using soft deletes)
+   */
+  public function withoutDeleted()
+  {
+    try {
+      return $this->db->query("SELECT * FROM $this->table WHERE deleted_at IS NULL")->get();
+    } catch (Exception $e) {
+      Log::critical("Database withoutDeleted error in Model.", "Database error: " . $e->getMessage());
+      return null;
+    }
+  }
+
+  /**
+   * Execute raw SQL query
+   */
+  public function raw(string $sql, array $params = [])
+  {
+    try {
+      return $this->db->query($sql, $params)->get();
+    } catch (Exception $e) {
+      Log::critical("Database raw query error in Model.", "Database error: " . $e->getMessage());
+      return null;
     }
   }
 }

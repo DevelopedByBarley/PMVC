@@ -16,7 +16,7 @@
             </div>
 
             <form action="/login" method="POST" enctype="multipart/form-data">
-              @csrf
+              <?php csrf(); ?>
 
               <!-- Email Input -->
               <div class="form-floating mb-4">

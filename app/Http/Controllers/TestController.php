@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Post;
 use Core\Database;
 use Core\Response;
 
 class TestController extends Controller
 {
   private Database $db;
+  protected $post;
 
   public function __construct()
   {
-    $this->db = new Database();
+    $this->db = Database::getInstance();
+    $this->post = new Post();
   }
 
 
@@ -21,6 +24,8 @@ class TestController extends Controller
   public function index()
   {
 
+
+    $this->post->updateById(6, ['body' => 'Updated Post Title']);
     return Response::json([
       'message' => 'Test index method called successfully!',
     ]);
