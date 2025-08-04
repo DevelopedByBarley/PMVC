@@ -51,3 +51,7 @@
 [DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
 [2025-02-02 19:27:30] CRITICAL: Database fail in query method
 [DEV] Fail in Database class query function with message:SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'phone' at row 1
+[2025-08-04 11:47:38] CRITICAL: Database connection fail!
+[DEV] Fail in Database class construct function with message:SQLSTATE[HY000] [1049] Unknown database 'mvc'
+[2025-08-04 11:47:38] CRITICAL: Database connection fail!
+[DEV] Fail in Database class construct function with message:SQLSTATE[HY000] [1049] Unknown database 'mvc'

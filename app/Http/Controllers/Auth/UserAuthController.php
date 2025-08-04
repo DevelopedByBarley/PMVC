@@ -56,9 +56,13 @@ class UserAuthController extends Controller
       return Navigator::redirect('/user');
     }
 
+    $users = $this->User->all();
+
+    
     return Response::view('auth/create', 'layout', [
       "errors" => Session::get('errors') ?? [],
-      'test' => 'test value'
+      'test' => 'test value',
+      'users' => $users
     ]);
   }
 

@@ -2,4 +2,4 @@
 
 <?php
 define('APP_NAME', $_ENV['APP_NAME'] ?? "Initial App");
-define('TEMPLATE_ENGINE', true);
+define('TEMPLATE_ENGINE', false);
