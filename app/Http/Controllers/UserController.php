@@ -16,26 +16,18 @@ class UserController extends Controller
     parent::__construct();
     $this->User = new User();
   }
- 
+
   public function index()
   {
     $search = $_GET['search'] ?? '';
     $user =  Session::get('user');
-  
-  
-    $this->toast->success('Sikeres mentés!')
-      ->title('Adatok mentve')
-      ->description('Az adatok sikeresen mentésre kerültek.')
-      ->delay(3000)
-      ->icon('fas fa-check-circle')
-      ->show();
 
     return Response::view('auth/index', 'layout', [
       'user' => $user,
       'search' => $search
     ]);
 
-   /*  echo view('components/user-layout', [
+    /*  echo view('components/user-layout', [
       'root' => view('user/index', [
         'title' => 'Üdvözöljük',
         'paginated' => $users,
@@ -48,10 +40,34 @@ class UserController extends Controller
   {
     $user =  Session::get('user');
 
-    echo view('components/layout', [
-      'root' => view('auth/show', [
-        'user' => $user,
-      ])
+    return Response::view('auth/show', 'layout', [
+      'user' => $user
     ]);
+  }
+
+  public function update()
+  {
+    $user = Session::get('user');
+    $data = request();
+
+    // Validáció
+    $this->request->validate([
+      'name' => 'required|string|max:255',
+      'email' => 'required|email|max:255',
+      'avatar' => 'nullable|file|image|max:2048'
+    ]);
+
+    // Frissítés
+    $this->User->update($user->id, $data);
+
+    // Visszajelzés
+    $this->toast->success('Profil frissítve!')
+      ->title('Sikeres frissítés')
+      ->description('A profil adatai sikeresen frissítve lettek.')
+      ->delay(3000)
+      ->icon('fas fa-check-circle')
+      ->show();
+
+    return Response::redirect('/user/profile'); 
   }
 }

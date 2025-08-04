@@ -23,8 +23,8 @@ class AdminController extends Controller
 
   public function index()
   {
-    $search = isset($_GET['search']) ? sanitize($_GET['search']) : '';
-    $paginated = $this->Admin->all(true, $search, ['name', 'email', 'created_at']);
+    $search = isset($_GET['search']) ? sanitize($_GET['search']) : [];
+    $paginated = $this->Admin->all(true, $search, ['name', 'email']);
 
 
     return Response::view('admin/index', 'admin-layout', [

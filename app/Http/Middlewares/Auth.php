@@ -18,13 +18,20 @@ class Auth
     {
         Session::create();
         if (!isset($_SESSION['user']) || !$_SESSION['user']) {
-            return header('Location: /login');
+            header('Location: /login');
             exit();
         } else {
             $email = $_SESSION['user']->email;
             $user = $this->db->query("SELECT * FROM users WHERE email = :email", [':email' => $email])->find();
-            unset($user->password);
-            $_SESSION['user'] = $user;
+            if ($user) {
+                unset($user->password);
+                $_SESSION['user'] = $user;
+            } else {
+                // User not found in database, redirect to login
+                unset($_SESSION['user']);
+                header('Location: /login');
+                exit();
+            }
         }
     }
 }

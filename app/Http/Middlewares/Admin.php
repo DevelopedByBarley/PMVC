@@ -18,13 +18,20 @@ class Admin
 	{
 		Session::create();
 		if (!isset($_SESSION['admin']) || !$_SESSION['admin']) {
-			return header('Location: /admin');
+			header('Location: /admin');
 			exit();
 		} else {
 			$email = $_SESSION['admin']->email;
 			$admin = $this->db->query("SELECT * FROM admins WHERE email = :email", [':email' => $email])->find();
-			unset($admin->password);
-			$_SESSION['admin'] = $admin;
+			if ($admin) {
+				unset($admin->password);
+				$_SESSION['admin'] = $admin;
+			} else {
+				// User not found in database, redirect to login
+				unset($_SESSION['admin']);
+				header('Location: /admin');
+				exit();
+			}
 		}
 	}
 }

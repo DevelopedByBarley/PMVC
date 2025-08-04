@@ -60,7 +60,7 @@
                   <i class="fas fa-images fa-2x text-muted mb-2 d-block my-2"></i>
                   <input class="form-control form-control-sm"
                     type="file"
-                    name="file[]"
+                    name="file"
                     multiple
                     id="formFile"
                     style="background: transparent;">

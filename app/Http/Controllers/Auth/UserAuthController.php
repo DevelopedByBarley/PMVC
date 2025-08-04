@@ -106,7 +106,8 @@ class UserAuthController extends Controller
 
   public function store()
   {
-    (new Storage())->files($_FILES['file'])->deletePrevImages('/', ['1992607091679a707a21ff06.02347278  .jpg'])->save();
+    $file = request('file');
+    (new Storage())->file($file)->save();
     $faker = Faker::create();
     try {
       $validated = $this->request->validate([

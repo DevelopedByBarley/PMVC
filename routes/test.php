@@ -2,4 +2,4 @@
 
 use App\Http\Controllers\TestController;
 
-$router->resources('test', TestController::class);
+$router->except(['index', 'show', 'create'])->resources('test', TestController::class, ['admin']);

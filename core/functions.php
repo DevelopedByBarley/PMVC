@@ -267,7 +267,8 @@ function config($file = null)
 
 function request($key = null, $default = null) 
 {
-  $data = array_merge($_GET, $_POST);
+  // Összevonjuk az összes input adatot
+  $data = array_merge($_GET, $_POST, $_FILES);
   
   if ($key === null) {
     return $data;
