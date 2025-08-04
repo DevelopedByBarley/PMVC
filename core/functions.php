@@ -121,7 +121,7 @@ function mail_temp_path($path)
 }
 
 
-function paginate($paginated, $with_search = true)
+function paginate($paginated, $with_search = false)
 {
   require view_path('components/pagination');
 }

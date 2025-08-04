@@ -4,6 +4,7 @@ $currentPage = $_GET['offset'] ?? 1;
 $totalPages = (int)$paginated->total_pages; // összes oldalszám
 $searchParameter = isset($_GET['search']) ? '?search=' . $_GET['search'] : '';
 
+
 ?>
 
 <nav class="d-flex justify-content-between">
@@ -23,11 +24,13 @@ $searchParameter = isset($_GET['search']) ? '?search=' . $_GET['search'] : '';
         <span aria-hidden="true">&raquo;</span>
       </a>
     </li>
-    <form class="d-flex mx-2">
-      <input type="search" id="search" name="search" value="<?= $_GET['search'] ?? ''?>" class="form-control " />
-      <button class="btn btn-primary">
-        <i class="fas fa-search"></i>
-      </button>
-    </form>
+    <?php if ($with_search): ?>
+      <li class="page-item">
+        <form class="form-inline" action="" method="GET">
+          <input type="text" name="search" class="form-control" placeholder="Search..." value="<?php echo htmlspecialchars($_GET['search'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+      </li>
+    <?php endif; ?>
   </ul>
 </nav>
