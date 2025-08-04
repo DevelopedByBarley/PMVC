@@ -82,7 +82,7 @@ class Mailer
 
   public function template($templateName, $data = [])
   {
-    // Sablon alkalmazása (ha van)
+
     $templatePath = mail_temp_path($templateName);
     if (file_exists($templatePath)) {
       ob_start();

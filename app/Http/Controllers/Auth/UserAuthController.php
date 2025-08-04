@@ -40,7 +40,7 @@ class UserAuthController extends Controller
   {
     $user =  Session::get('user');
 
-    
+
     echo view('components/layout', [
       'root' => view('auth/show', [
         'user' => $user,
@@ -58,7 +58,7 @@ class UserAuthController extends Controller
 
     $users = $this->User->all();
 
-    
+
     return Response::view('auth/create', 'layout', [
       "errors" => Session::get('errors') ?? [],
       'test' => 'test value',
@@ -72,7 +72,7 @@ class UserAuthController extends Controller
     if (Session::get('user')) {
       return Navigator::redirect('/user');
     }
-    
+
     Response::view('auth/store', 'layout', [
       "errors" => Session::get('errors') ?? [],
       'old' => Session::get('old') ?? []
@@ -86,7 +86,7 @@ class UserAuthController extends Controller
 
     try {
       $validated = $this->request->validate([
-        "email" => ['required'],
+        "email" => ['required', 'email'],
         "password" => ['required'],
       ]);
     } catch (ValidationException $exception) {
@@ -115,7 +115,7 @@ class UserAuthController extends Controller
     $faker = Faker::create();
     try {
       $validated = $this->request->validate([
-        "email" => ['required', 'unique:email|users'],
+        "email" => ['required', 'email',  'unique:email|users'],
         "password" => ['required'],
       ]);
     } catch (ValidationException $exception) {
@@ -143,7 +143,7 @@ class UserAuthController extends Controller
 
       $verify = new EmailVerify();
 
-      $verify->store($last_id, $token, $expires_at)->send($email, $password , $based);
+      $verify->store($last_id, $token, $expires_at)->send($email, $password, $based);
 
 
       //$this->auth::login('user', $email);
@@ -155,7 +155,7 @@ class UserAuthController extends Controller
         ->position('bottom-0 end-0')
         ->delay(3000)
         ->icon('fas fa-check-circle')
-        ->back(); 
+        ->back();
     }
   }
 
