@@ -65,7 +65,7 @@ class Template
 
   public static function render($path, $data = [])
   {
-    $templatePath = base_path("resources/views/{$path}.view.php");
+    $templatePath = base_path("resources/views/{$path}.blade.php");
     $compiledFile = self::$compiledPath . '/' . md5($path) . '.php';
 
     // Cache ellenőrzés

@@ -44,7 +44,7 @@ function abort($code = 404)
 {
   http_response_code($code);
 
-  require base_path("resources/views/status/{$code}.view.php");
+  require base_path("resources/views/status/{$code}.blade.php");
 
   die();
 }
@@ -71,7 +71,7 @@ function view($path, $root = '', $params = [], $engine = false): string
   }
 
   // Ellenőrizzük, hogy létezik-e a template fájl
-  $filePath = base_path('resources/views/' . $path . '.view.php');
+  $filePath = base_path('resources/views/' . $path . '.blade.php');
   if (!file_exists($filePath)) {
     throw new \Exception("View file not found: " . $filePath);
   }
@@ -107,7 +107,7 @@ function old($key, $default = '')
 
 function view_path($path)
 {
-  return BASE_PATH . 'resources/views/' . $path . '.view.php';
+  return BASE_PATH . 'resources/views/' . $path . '.blade.php';
 }
 
 function tmpPath($file)
