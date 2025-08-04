@@ -54,6 +54,7 @@ class Template
     $template = preg_replace('/@asset\s*\(\s*(.+?)\s*\)/', '<?= public_file($1) ?>', $template);
     $template = preg_replace('/@lang\s*\(\s*(.+?)\s*\)/', '<?= lang($1) ?>', $template);
     $template = preg_replace('/@paginate\s*\(\s*(.+?)\s*\)/', '<?php paginate($1, false); ?>', $template);
+    $template = preg_replace('/@method\s*\(\s*[\'"](.+?)[\'"]\s*\)/', '<input type="hidden" name="_method" value="$1">', $template);
 
     // Include
     $template = preg_replace('/@include\s*\(\s*(.+?)\s*\)/', '<?= view($1) ?>', $template);

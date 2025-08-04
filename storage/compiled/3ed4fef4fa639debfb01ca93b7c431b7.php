@@ -22,8 +22,8 @@
         </div>
         <div class="card-body">
           <form class="row gap-5" action="/user/<?= $user->id ?>" method="POST">
-            @csrf
-            @method('PATCH')
+            <?php csrf(); ?>
+            <input type="hidden" name="_method" value="PATCH">
 
             <div class="col-12 form-group row">
               <label for="name" class="col-md-3 col-form-label">Name</label>

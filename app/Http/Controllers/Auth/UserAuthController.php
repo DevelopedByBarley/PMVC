@@ -115,7 +115,7 @@ class UserAuthController extends Controller
     $faker = Faker::create();
     try {
       $validated = $this->request->validate([
-        "email" => ['required', 'email',  'unique:email|users'],
+        "email" => ['required', 'email','unique:email|users'],
         "password" => ['required'],
       ]);
     } catch (ValidationException $exception) {
