@@ -71,6 +71,26 @@ class Response
     exit;
   }
 
+  public static function api($data)
+  {
+    // CSRF token lekérése
+    $csrfToken = (new CSRF())->generate()->getToken();
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token');
+    header('Access-Control-Expose-Headers: X-CSRF-Token'); // EZ HIÁNYZOTT!
+    header("X-CSRF-Token: {$csrfToken}");
+
+    // Preflight request handling
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+      http_response_code(204);
+      exit;
+    }
+
+    return self::json($data);
+  }
+
   public static function status($code)
   {
     http_response_code($code);

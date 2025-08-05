@@ -26,13 +26,13 @@ class Router
 		'update'  => ['PATCH', '/{id}'],
 		'destroy' => ['DELETE', '/{id}'],
 	];
+
 	protected $exceptions = [];
 	protected $csrfProtectedMethods = ['POST', 'DELETE', 'PATCH', 'PUT'];
 
 
-	/**
-	 * Új route hozzáadása
-	 */
+
+
 	public function add($method, $uri, $controller)
 	{
 		$this->routes[] = [
@@ -57,6 +57,28 @@ class Router
 	 * Resource route-ok generálása
 	 * Használat: $router->resources('users', UserController::class)
 	 */
+
+
+	public function apiResource($uri, $controller, $middleware = null)
+	{
+		if (!class_exists($controller)) {
+			throw new \Exception("Controller '{$controller}' not found.");
+		}
+
+		$resourceRoutes = $this->getFilteredResourceRoutes();
+
+		foreach ($resourceRoutes as $action => [$method, $suffix]) {
+			$this->{strtolower($method)}("/api/{$uri}{$suffix}", [$controller, $action]);
+
+			if ($middleware) {
+				$this->middleware($middleware);
+			}
+		}
+
+		$this->resetExceptions();
+		return $this;
+	}
+
 	public function resources($uri, $controller, $middleware = null)
 	{
 		if (!class_exists($controller)) {
@@ -67,7 +89,7 @@ class Router
 
 		foreach ($resourceRoutes as $action => [$method, $suffix]) {
 			$this->{strtolower($method)}("/{$uri}{$suffix}", [$controller, $action]);
-			
+
 			if ($middleware) {
 				$this->middleware($middleware);
 			}
@@ -162,6 +184,34 @@ class Router
 		return $this->add('PUT', $uri, $controller);
 	}
 
+
+	public function apiGet($uri, $controller)
+	{
+		return $this->add('GET', "/api{$uri}", $controller);
+	}
+
+	public function apiPost($uri, $controller)
+	{
+		return $this->add('POST', "/api{$uri}", $controller);
+	}
+
+	public function apiDelete($uri, $controller)
+	{
+		return $this->add('DELETE', "/api{$uri}", $controller);
+	}
+
+	public function apiPatch($uri, $controller)
+	{
+		return $this->add('PATCH', "/api{$uri}", $controller);
+	}
+
+	public function apiPut($uri, $controller)
+	{
+		return $this->add('PUT', "/api{$uri}", $controller);
+	}
+
+	
+
 	/**
 	 * View route - közvetlenül view megjelenítésére
 	 */
@@ -183,7 +233,7 @@ class Router
 
 		$lastRouteIndex = array_key_last($this->routes);
 		$this->routes[$lastRouteIndex]['middleware'] = $key;
-		
+
 		return $this;
 	}
 
@@ -257,7 +307,7 @@ class Router
 		} finally {
 			Session::unflash();
 		}
-		
+
 		exit();
 	}
 
@@ -289,7 +339,7 @@ class Router
 		}
 
 		$csrf_config = require base_path('config/auth.php');
-		
+
 		if ($csrf_config['csrf']['protect']) {
 			// TODO: CSRF ellenőrzés implementálása
 			(new CSRF)->check();
@@ -312,7 +362,7 @@ class Router
 		// Controller osztály kezelése
 		if (is_array($controller)) {
 			[$controllerClass, $method] = $controller;
-			
+
 			if (!class_exists($controllerClass)) {
 				throw new \Exception("Controller '{$controllerClass}' not found.");
 			}

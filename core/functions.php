@@ -267,12 +267,180 @@ function config($file = null)
 
 function request($key = null, $default = null) 
 {
-  // Összevonjuk az összes input adatot
-  $data = array_merge($_GET, $_POST, $_FILES);
+  static $requestData = null;
   
-  if ($key === null) {
-    return $data;
+  // Cache-eljük az eredményt, hogy ne kelljen többször feldolgozni
+  if ($requestData === null) {
+    // Alapértelmezett adatok
+    $requestData = array_merge($_GET, $_POST, $_FILES);
+    
+    // Content-Type ellenőrzése
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+    $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    
+    // JSON input kezelése
+    if (strpos($contentType, 'application/json') !== false) {
+      $jsonInput = file_get_contents('php://input');
+      if ($jsonInput) {
+        $jsonData = json_decode($jsonInput, true);
+        
+        if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
+          $requestData = array_merge($requestData, $jsonData);
+        }
+      }
+    }
+    // Form-encoded data kezelése (PUT, PATCH, DELETE esetén)
+    elseif (in_array($requestMethod, ['PUT', 'PATCH', 'DELETE']) && 
+            (strpos($contentType, 'application/x-www-form-urlencoded') !== false || 
+             strpos($contentType, 'multipart/form-data') !== false)) {
+      $rawInput = file_get_contents('php://input');
+      if ($rawInput) {
+        parse_str($rawInput, $parsedData);
+        if (is_array($parsedData)) {
+          $requestData = array_merge($requestData, $parsedData);
+        }
+      }
+    }
+    // Raw input kezelése egyéb esetekben
+    elseif (empty($_POST) && !empty($_SERVER['CONTENT_LENGTH'])) {
+      $rawInput = file_get_contents('php://input');
+      if ($rawInput) {
+        // Próbáljuk query string-ként parse-olni
+        parse_str($rawInput, $parsedData);
+        if (is_array($parsedData)) {
+          $requestData = array_merge($requestData, $parsedData);
+        }
+      }
+    }
   }
   
-  return $data[$key] ?? $default;
+  if ($key === null) {
+    return $requestData;
+  }
+  
+  return $requestData[$key] ?? $default;
+}
+
+/**
+ * X-CSRF-Token lekérése a request header-ből
+ */
+function getCsrfTokenFromHeader($default = null)
+{
+  // Ellenőrizzük a különböző header formátumokat
+  $headers = [
+    'HTTP_X_CSRF_TOKEN',
+    'HTTP_X_XSRF_TOKEN', 
+    'HTTP_CSRF_TOKEN'
+  ];
+  
+  foreach ($headers as $header) {
+    if (isset($_SERVER[$header]) && !empty($_SERVER[$header])) {
+      return $_SERVER[$header];
+    }
+  }
+  
+  return $default;
+}
+
+/**
+ * CSRF token lekérése minden lehetséges helyről
+ */
+function getCsrfToken($default = null)
+{
+  // 1. Először a header-ből próbáljuk
+  $token = getCsrfTokenFromHeader();
+  if ($token) {
+    return $token;
+  }
+  
+  // 2. POST adatokból (_token mező)
+  $token = request('_token');
+  if ($token) {
+    return $token;
+  }
+  
+  // 3. Meta tag-ből (ha van csrf meta tag az oldalon)
+  $token = request('csrf_token');
+  if ($token) {
+    return $token;
+  }
+  
+  return $default;
+}
+
+/**
+ * Ellenőrzi hogy a request tartalmaz-e CSRF tokent
+ */
+function hasCsrfToken(): bool
+{
+  return getCsrfToken() !== null;
+}
+
+/**
+ * CSRF token validálása
+ */
+function validateCsrfToken(): bool
+{
+  $requestToken = getCsrfToken();
+  
+  if (!$requestToken) {
+    return false;
+  }
+  
+  // Ellenőrizzük a session-ben tárolt token-nel
+  $sessionToken = Session::get('csrf_token');
+  
+  return $requestToken === $sessionToken;
+}
+
+/**
+ * Authorization Bearer token lekérése
+ */
+function getBearerToken($default = null)
+{
+  $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+  
+  if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+    return $matches[1];
+  }
+  
+  return $default;
+}
+
+/**
+ * Összes request header lekérése
+ */
+function getRequestHeaders(): array
+{
+  if (function_exists('getallheaders')) {
+    return getallheaders();
+  }
+  
+  // Fallback ha nincs getallheaders()
+  $headers = [];
+  foreach ($_SERVER as $name => $value) {
+    if (substr($name, 0, 5) == 'HTTP_') {
+      $headerName = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($name, 5)))));
+      $headers[$headerName] = $value;
+    }
+  }
+  
+  return $headers;
+}
+
+/**
+ * Specifikus header lekérése
+ */
+function getHeader($name, $default = null)
+{
+  $headers = getRequestHeaders();
+  
+  // Case-insensitive keresés
+  foreach ($headers as $key => $value) {
+    if (strtolower($key) === strtolower($name)) {
+      return $value;
+    }
+  }
+  
+  return $default;
 }
