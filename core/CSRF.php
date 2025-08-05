@@ -81,13 +81,11 @@ class CSRF
     }
 
     if (!$valid_token_found) {
-      dd('valid token not found');
       abort(419);
       return false;
     }
 
     if (!$this->isSafeOrigin()) {
-      dd('Unsafe origin detected');
       abort(419);
       return false;
     }
