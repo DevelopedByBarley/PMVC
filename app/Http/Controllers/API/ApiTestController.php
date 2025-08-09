@@ -2,26 +2,32 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\User;
 use Core\Response;
 
 class ApiTestController extends ApiController
 {
+
+    protected $user;
     public function __construct()
     {
-           parent::__construct();
+        parent::__construct();
+        $this->user = new User();
     }
 
     public function index()
     {
-        $users = $this->db->query('SELECT * FROM users')->get();
+        $users = $this->user->all();
+
         Response::api([
             'status' => 'success',
-            'data' => $users
+            'data' => $users,
         ]);
     }
 
 
-    public function show($vars) {
+    public function show($vars)
+    {
 
         return Response::api([
             'status' => 'success',
@@ -52,6 +58,4 @@ class ApiTestController extends ApiController
             'message' => 'Resource updated successfully'
         ]);
     }
-
-
 }
