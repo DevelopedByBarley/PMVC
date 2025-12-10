@@ -301,8 +301,9 @@ class Database
         return $this;
     }
 
-    public function paginate(int $limit = 25, array $search = [], array $search_columns = [])
+        public function paginate(int $limit = 25, $search = [], array $search_columns = [])
     {
+        // Biztosítjuk, hogy a search paraméter megfelelő típusú legyen a Paginator számára
         $data = $this->statement->fetchAll(PDO::FETCH_OBJ);
         return $this->paginator->data($data)->filter($search, $search_columns)->paginate($limit);
     }

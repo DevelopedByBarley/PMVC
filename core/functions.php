@@ -21,13 +21,143 @@ function errors($key, $errors)
   }
 }
 
-function dd($value)
+function dd(...$vars)
 {
-  echo "<pre>";
-  var_dump($value);
-  echo "</pre>";
+  // Ha nincs átadott változó, akkor üres dd()-t hívtak meg
+  if (empty($vars)) {
+    echo '<pre style="background: #18171B; color: #FF6C37; padding: 20px; border-radius: 5px; font-family: \'Fira Code\', monospace; font-size: 14px; line-height: 1.6; border-left: 4px solid #FF6C37;">';
+    echo '<strong>dd() called with no arguments</strong>';
+    echo '</pre>';
+    die(1);
+  }
 
-  die();
+  // Színséma
+  $style = "
+    <style>
+      .dd-container {
+        background: #18171B;
+        color: #E1E1E6;
+        padding: 20px;
+        margin: 10px 0;
+        border-radius: 8px;
+        font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        border-left: 4px solid #FF6C37;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
+      .dd-header {
+        color: #FF6C37;
+        font-weight: bold;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #2D2C31;
+        font-size: 16px;
+      }
+      .dd-type {
+        color: #78DCE8;
+        font-weight: bold;
+      }
+      .dd-string {
+        color: #AAD94C;
+      }
+      .dd-number {
+        color: #FFD866;
+      }
+      .dd-bool {
+        color: #FF6188;
+      }
+      .dd-null {
+        color: #AB9DF2;
+      }
+      .dd-key {
+        color: #78DCE8;
+      }
+      .dd-trace {
+        background: #2D2C31;
+        padding: 10px;
+        margin-top: 15px;
+        border-radius: 5px;
+        font-size: 12px;
+        color: #939293;
+      }
+      .dd-trace-file {
+        color: #A9DC76;
+      }
+      .dd-trace-line {
+        color: #FFD866;
+      }
+    </style>
+  ";
+
+  echo $style;
+
+  foreach ($vars as $index => $var) {
+    $varNumber = count($vars) > 1 ? " #" . ($index + 1) : "";
+
+    echo "<div class='dd-container'>";
+    echo "<div class='dd-header'>🔍 Debug Output{$varNumber}</div>";
+
+    // Típus meghatározás
+    $type = gettype($var);
+    echo "<div><span class='dd-type'>" . ucfirst($type) . "</span>";
+
+    // Extra információk típusonként
+    if (is_array($var)) {
+      echo " <span class='dd-number'>(" . count($var) . " items)</span>";
+    } elseif (is_string($var)) {
+      echo " <span class='dd-number'>(" . strlen($var) . " chars)</span>";
+    } elseif (is_object($var)) {
+      echo " <span class='dd-number'>(" . get_class($var) . ")</span>";
+    }
+    echo "</div>";
+
+    echo "<pre style='margin: 15px 0 0 0; padding: 0; background: transparent; border: none;'>";
+
+    // Formázott kimenet
+    if (is_null($var)) {
+      echo "<span class='dd-null'>NULL</span>";
+    } elseif (is_bool($var)) {
+      echo "<span class='dd-bool'>" . ($var ? 'TRUE' : 'FALSE') . "</span>";
+    } elseif (is_string($var)) {
+      echo "<span class='dd-string'>\"" . htmlspecialchars($var) . "\"</span>";
+    } elseif (is_numeric($var)) {
+      echo "<span class='dd-number'>" . $var . "</span>";
+    } else {
+      // Objektumok és tömbök print_r-rel, színezéssel
+      $output = print_r($var, true);
+      $output = htmlspecialchars($output);
+
+      // Színezés
+      $output = preg_replace('/\[(.*?)\]/', '[<span class="dd-key">$1</span>]', $output);
+      $output = preg_replace('/=>\s*(\d+)/', '=> <span class="dd-number">$1</span>', $output);
+      $output = preg_replace('/=>\s*\'(.*?)\'/', '=> <span class="dd-string">\'$1\'</span>', $output);
+      $output = preg_replace('/=>\s*\"(.*?)\"/', '=> <span class="dd-string">"$1"</span>', $output);
+
+      echo $output;
+    }
+
+    echo "</pre>";
+
+    // Backtrace - honnan hívták a dd()-t
+    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+    if (isset($trace[0])) {
+      $file = $trace[0]['file'] ?? 'unknown';
+      $line = $trace[0]['line'] ?? 'unknown';
+
+      // Relatív útvonal
+      $file = str_replace(BASE_PATH, '', $file);
+
+      echo "<div class='dd-trace'>";
+      echo "📍 Called from: <span class='dd-trace-file'>{$file}</span>:<span class='dd-trace-line'>{$line}</span>";
+      echo "</div>";
+    }
+
+    echo "</div>";
+  }
+
+  // Script leállítása
+  die(1);
 }
 
 function urlIs($value)
@@ -265,34 +395,36 @@ function config($file = null)
   }
 }
 
-function request($key = null, $default = null) 
+function request($key = null, $default = null)
 {
   static $requestData = null;
-  
+
   // Cache-eljük az eredményt, hogy ne kelljen többször feldolgozni
   if ($requestData === null) {
     // Alapértelmezett adatok
     $requestData = array_merge($_GET, $_POST, $_FILES);
-    
+
     // Content-Type ellenőrzése
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
     $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    
+
     // JSON input kezelése
     if (strpos($contentType, 'application/json') !== false) {
       $jsonInput = file_get_contents('php://input');
       if ($jsonInput) {
         $jsonData = json_decode($jsonInput, true);
-        
+
         if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
           $requestData = array_merge($requestData, $jsonData);
         }
       }
     }
     // Form-encoded data kezelése (PUT, PATCH, DELETE esetén)
-    elseif (in_array($requestMethod, ['PUT', 'PATCH', 'DELETE']) && 
-            (strpos($contentType, 'application/x-www-form-urlencoded') !== false || 
-             strpos($contentType, 'multipart/form-data') !== false)) {
+    elseif (
+      in_array($requestMethod, ['PUT', 'PATCH', 'DELETE']) &&
+      (strpos($contentType, 'application/x-www-form-urlencoded') !== false ||
+        strpos($contentType, 'multipart/form-data') !== false)
+    ) {
       $rawInput = file_get_contents('php://input');
       if ($rawInput) {
         parse_str($rawInput, $parsedData);
@@ -313,11 +445,11 @@ function request($key = null, $default = null)
       }
     }
   }
-  
+
   if ($key === null) {
     return $requestData;
   }
-  
+
   return $requestData[$key] ?? $default;
 }
 
@@ -329,16 +461,16 @@ function getCsrfTokenFromHeader($default = null)
   // Ellenőrizzük a különböző header formátumokat
   $headers = [
     'HTTP_X_CSRF_TOKEN',
-    'HTTP_X_XSRF_TOKEN', 
+    'HTTP_X_XSRF_TOKEN',
     'HTTP_CSRF_TOKEN'
   ];
-  
+
   foreach ($headers as $header) {
     if (isset($_SERVER[$header]) && !empty($_SERVER[$header])) {
       return $_SERVER[$header];
     }
   }
-  
+
   return $default;
 }
 
@@ -352,19 +484,19 @@ function getCsrfToken($default = null)
   if ($token) {
     return $token;
   }
-  
+
   // 2. POST adatokból (_token mező)
   $token = request('_token');
   if ($token) {
     return $token;
   }
-  
+
   // 3. Meta tag-ből (ha van csrf meta tag az oldalon)
   $token = request('csrf_token');
   if ($token) {
     return $token;
   }
-  
+
   return $default;
 }
 
@@ -382,14 +514,14 @@ function hasCsrfToken(): bool
 function validateCsrfToken(): bool
 {
   $requestToken = getCsrfToken();
-  
+
   if (!$requestToken) {
     return false;
   }
-  
+
   // Ellenőrizzük a session-ben tárolt token-nel
   $sessionToken = Session::get('csrf_token');
-  
+
   return $requestToken === $sessionToken;
 }
 
@@ -399,11 +531,11 @@ function validateCsrfToken(): bool
 function getBearerToken($default = null)
 {
   $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-  
+
   if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
     return $matches[1];
   }
-  
+
   return $default;
 }
 
@@ -415,7 +547,7 @@ function getRequestHeaders(): array
   if (function_exists('getallheaders')) {
     return getallheaders();
   }
-  
+
   // Fallback ha nincs getallheaders()
   $headers = [];
   foreach ($_SERVER as $name => $value) {
@@ -424,7 +556,7 @@ function getRequestHeaders(): array
       $headers[$headerName] = $value;
     }
   }
-  
+
   return $headers;
 }
 
@@ -434,13 +566,13 @@ function getRequestHeaders(): array
 function getHeader($name, $default = null)
 {
   $headers = getRequestHeaders();
-  
+
   // Case-insensitive keresés
   foreach ($headers as $key => $value) {
     if (strtolower($key) === strtolower($name)) {
       return $value;
     }
   }
-  
+
   return $default;
 }

@@ -36,7 +36,7 @@ class Validator
     foreach ($request as $req_key => $req_value) {
       $req_value = sanitize($req_value);
       $validator = $rules[$req_key] ?? [];
-      
+
       foreach ($validator as $val_value) {
         $validationResult = static::executeValidator($req_value, $val_value);
         $ret[$req_key][$validationResult['name']] = $validationResult;
@@ -44,8 +44,18 @@ class Validator
     }
 
     $errors = static::errors($ret);
+
     if (!empty($errors)) {
       return ValidationException::throw($errors, $request);
+    }
+
+    $keys = array_keys($ret);
+
+    // If key doesnt exist in request, unset it
+    foreach ($request as $key => $value) {
+      if (!in_array($key, $keys)) {
+        unset($request[$key]);
+      }
     }
 
     return $request;
@@ -60,9 +70,9 @@ class Validator
       $parts = explode(":", $rule, 2); // Limit 2-re a biztonság kedvéért
       $validatorName = $parts[0];
       $validatorValue = $parts[1];
-      
+
       $status = static::$validatorName($value, $validatorValue);
-      
+
       return [
         'name' => $validatorName,
         'status' => $status,
@@ -70,7 +80,7 @@ class Validator
       ];
     } else {
       $status = static::$rule($value);
-      
+
       return [
         'name' => $rule,
         'status' => $status,
