@@ -2,12 +2,22 @@
 
 use Core\Cookie;
 use Core\Response;
+use Core\Router;
 use Core\Session;
 use Core\Template;
 
 function session($entity)
 {
   return Session::get($entity);
+}
+
+function getRoutes() {
+  return dd((new Router())->getRoutes());
+}
+
+function auth($entity, $default = null)
+{
+  return Session::get($entity, $default);
 }
 
 function errors($key, $errors)
@@ -203,7 +213,7 @@ function view($path, $root = '', $params = [], $engine = false): string
   // Ellenőrizzük, hogy létezik-e a template fájl
   $filePath = base_path('resources/views/' . $path . '.blade.php');
   if (!file_exists($filePath)) {
-    throw new \Exception("View file not found: " . $filePath);
+    abort(404);
   }
 
   $output = '';
@@ -257,6 +267,10 @@ function paginate($paginated, $with_search = false)
 }
 function extractMapUrl($iframe)
 {
+  if( !$iframe ) {
+    return null;
+  }
+
   if (preg_match('/src="([^"]+)"/', $iframe, $matches)) {
     return $matches[1];
   }
