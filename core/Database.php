@@ -27,6 +27,9 @@ class Database
             $this->connection = new PDO($dsn, $config['name'], $config['password'], [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ]);
+            
+            // Növeljük a max_allowed_packet értéket 64MB-ra
+            $this->connection->exec("SET GLOBAL max_allowed_packet=67108864");
         } catch (PDOException $e) {
             Log::critical('Database connection fail!', 'Fail in Database class construct function with message:' . $e->getMessage());
             throw new Exception('Database connection failed: ' . $e->getMessage());

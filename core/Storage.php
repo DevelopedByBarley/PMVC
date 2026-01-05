@@ -2,7 +2,6 @@
 
 namespace Core;
 
-
 /* 
   Upload single file
   (new Storage())->file($_FILES['file'])->save("/");
@@ -27,6 +26,28 @@ class Storage
     $this->whiteList = $whiteList ?? $config['white_list'];
   }
 
+  public function getSimpleFileType($file)
+  {
+    return pathinfo($file["name"], PATHINFO_EXTENSION);
+  }
+
+  public function getTypeOfFile($file)
+  {
+    return mime_content_type($file["tmp_name"]);
+  }
+
+  public function prevCheckMimeType($files)
+  {
+    $formattedFiles = $this->formatFilesForSave($files);
+    $results = [];
+
+    foreach ($formattedFiles as $file) {
+      $fileType = $this->getTypeOfFile($file);
+      $results[] =  in_array($fileType, $this->whiteList);
+    }
+    return $results;
+  }
+
 
   // Add single file for uplodat,
   public function file($file)
@@ -35,7 +56,7 @@ class Storage
     if (empty($file) || !isset($file['name'])) {
       return $this;
     }
-    
+
     // Ha tömb formátumban van (multiple files), akkor az első elemet vesszük
     if (is_array($file['name'])) {
       if (empty($file['name'][0])) {
@@ -56,7 +77,7 @@ class Storage
       }
       $this->file = $file;
     }
-    
+
     $this->checkMimeType($this->file);
     return $this;
   }
@@ -90,7 +111,7 @@ class Storage
     if (!empty($arr_of_images) && is_array($arr_of_images)) {
       foreach ($arr_of_images as $image) {
         if (empty($image)) continue;
-        
+
         $imagePath = base_path('public/images' . $path . "/" . $image);
 
         if (file_exists($imagePath)) {
@@ -110,9 +131,9 @@ class Storage
     if ((!$this->file || is_null($this->file)) && (!$this->files || is_null($this->files))) {
       return null;
     }
-    
+
     $fileNames = [];
-    
+
     if (!empty($this->files)) {
       foreach ($this->files as $file) {
         $fileName = $this->saveFile($file, $path);
@@ -120,6 +141,7 @@ class Storage
           $fileNames[] = $fileName;
         }
       }
+
       return $fileNames;
     } else {
       $fileName = $this->saveFile($this->file, $path);
@@ -134,7 +156,7 @@ class Storage
       Log::error('File upload error', 'Upload error code: ' . $file['error']);
       return false;
     }
-    
+
     $rand = uniqid(rand(), true);
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
     $originalFileName = $rand . '.' . $ext;
@@ -148,15 +170,83 @@ class Storage
     }
 
     $destination = $directoryPath . '/' . $originalFileName;
-    
+
     if (!move_uploaded_file($file["tmp_name"], $destination)) {
       Log::error('File move failed', 'Failed to move file to: ' . $destination);
       return false;
     }
 
+    // Képfájlok optimalizálása
+    $this->optimizeImageIfNeeded($destination);
+
     return $originalFileName;
   }
 
+  private function optimizeImageIfNeeded($filePath)
+  {
+    // Támogatott képformátumok
+    $imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+
+    // Ha nem képfájl, nem csinálunk semmit
+    if (!in_array($ext, $imageExtensions)) {
+      return;
+    }
+
+    try {
+      // Formátumtól függően más optimalizálást alkalmazunk
+      if ($ext === 'png') {
+        $this->optimizePNG($filePath);
+      } elseif (in_array($ext, ['jpg', 'jpeg'])) {
+        $this->optimizeJPEG($filePath);
+      } elseif ($ext === 'gif') {
+        $this->optimizeGIF($filePath);
+      }
+      Log::info('Image optimized', 'File: ' . $filePath);
+    } catch (\Exception $e) {
+      Log::warning('Image optimization failed', 'File: ' . $filePath . ' Error: ' . $e->getMessage());
+    }
+  }
+
+  private function optimizePNG($filePath)
+  {
+    // PNG-t betöltjük memóriába
+    $image = imagecreatefrompng($filePath);
+    if ($image === false) return;
+
+    // Csökkentjük 256 szín paletára (drasztikus méretcsökkentés)
+    imagetruecolortopalette($image, true, 256);
+    // Maximális tömörítéssel (9) mentjük vissza az eredeti helyre
+    imagepng($image, $filePath, 9);
+    // Felszabadítjuk a memóriát (fontos!)
+    imagedestroy($image);
+  }
+
+  private function optimizeJPEG($filePath)
+  {
+    // JPG-t betöltjük memóriába
+    $image = imagecreatefromjpeg($filePath);
+    if ($image === false) return;
+
+    // 80%-os minőséggel mentjük vissza (jó minőség/méret arány)
+    imagejpeg($image, $filePath, 80);
+    // Felszabadítjuk a memóriát (fontos!)
+    imagedestroy($image);
+  }
+
+  private function optimizeGIF($filePath)
+  {
+    // GIF-et betöltjük memóriába
+    $image = imagecreatefromgif($filePath);
+    if ($image === false) return;
+
+    // Csökkentjük 256 szín paletára
+    imagetruecolortopalette($image, true, 256);
+    // Mentjük vissza az eredeti helyre
+    imagegif($image, $filePath);
+    // Felszabadítjuk a memóriát (fontos!)
+    imagedestroy($image);
+  }
 
   private function checkMimeType($file)
   {
@@ -166,7 +256,7 @@ class Storage
       (new Toast)->danger('Fájl feltöltési hiba, kérjük próbálja meg újra.')->back();
       return false;
     }
-    
+
     $fileType = mime_content_type($file["tmp_name"]);
 
     if (!in_array($fileType, $this->whiteList)) {
@@ -174,7 +264,7 @@ class Storage
       (new Toast)->danger('Hibás fájl formátum, kérjük próbálja meg újra.')->back();
       return false;
     }
-    
+
     return true;
   }
 
