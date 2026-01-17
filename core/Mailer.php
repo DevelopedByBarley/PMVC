@@ -22,7 +22,7 @@ class Mailer
           'allow_self_signed' => true
         )
       );
-      $mail->SMTPDebug = 2;
+      //$mail->SMTPDebug = 2;
 
       $this->mail->CharSet = 'UTF-8';
       $this->mail->IsSMTP();

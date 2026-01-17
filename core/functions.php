@@ -11,7 +11,8 @@ function session($entity)
   return Session::get($entity);
 }
 
-function getRoutes() {
+function getRoutes()
+{
   return dd((new Router())->getRoutes());
 }
 
@@ -30,6 +31,38 @@ function errors($key, $errors)
     }
   }
 }
+
+// Source - https://stackoverflow.com/a
+// Posted by Maerlyn, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-01-07, License - CC BY-SA 4.0
+
+function slugify($text, string $divider = '-')
+{
+  // replace non letter or digits by divider
+  $text = preg_replace('~[^\pL\d]+~u', $divider, $text);
+
+  // transliterate
+  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+  // remove unwanted characters
+  $text = preg_replace('~[^-\w]+~', '', $text);
+
+  // trim
+  $text = trim($text, $divider);
+
+  // remove duplicate divider
+  $text = preg_replace('~-+~', $divider, $text);
+
+  // lowercase
+  $text = strtolower($text);
+
+  if (empty($text)) {
+    return 'n-a';
+  }
+
+  return $text;
+}
+
 
 function dd(...$vars)
 {
@@ -170,6 +203,16 @@ function dd(...$vars)
   die(1);
 }
 
+function dbg($label, $data = null)
+{
+  if ($data !== null) {
+    \Core\Log::info($label, print_r($data, true));
+    return;
+  }
+
+  \Core\Log::info($label);
+}
+
 function urlIs($value)
 {
   return $_SERVER['REQUEST_URI'] === $value;
@@ -267,7 +310,7 @@ function paginate($paginated, $with_search = false)
 }
 function extractMapUrl($iframe)
 {
-  if( !$iframe ) {
+  if (!$iframe) {
     return null;
   }
 

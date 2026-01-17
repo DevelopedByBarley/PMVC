@@ -89,7 +89,6 @@ class Router
 
 		foreach ($resourceRoutes as $action => [$method, $suffix]) {
 			$this->{strtolower($method)}("/{$uri}{$suffix}", [$controller, $action]);
-
 			if ($middleware) {
 				$this->middleware($middleware);
 			}
@@ -210,7 +209,7 @@ class Router
 		return $this->add('PUT', "/api{$uri}", $controller);
 	}
 
-	
+
 
 	/**
 	 * View route - közvetlenül view megjelenítésére
@@ -291,8 +290,7 @@ class Router
 	{
 		$pattern = $this->buildRoutePattern($routeUri);
 		preg_match($pattern, $uri, $matches);
-		array_shift($matches); // Első elem eltávolítása (teljes egyezés)
-		return $matches;
+		return isset($matches[1]) ? (int)$matches[1] : [];
 	}
 
 	/**

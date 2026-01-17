@@ -18,6 +18,14 @@ class Request
     return $_POST[$key];
   }
 
+  public static function get($key)
+  {
+    if(!$key || !isset($_GET[$key]) || empty($_GET[$key])) {
+      return null;
+    }
+    return $_GET[$key];
+  }
+
   public static function unset($key)
   {
     unset($_POST[$key]);
@@ -35,5 +43,10 @@ class Request
     if (!$_POST[$key] || !isset($_POST[$key]) || empty($_POST[$key])) {
       $_POST[$key] = null;
     }
+  }
+
+  public function file($key)
+  {
+    return $_FILES[$key] ?? null;
   }
 }

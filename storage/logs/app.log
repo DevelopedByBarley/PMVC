@@ -55,3 +55,9 @@
 [DEV] Fail in Database class construct function with message:SQLSTATE[HY000] [1049] Unknown database 'mvc'
 [2025-08-04 11:47:38] CRITICAL: Database connection fail!
 [DEV] Fail in Database class construct function with message:SQLSTATE[HY000] [1049] Unknown database 'mvc'
+[2026-01-17 19:37:56] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.activities' doesn't exist
+[2026-01-17 19:37:56] CRITICAL: Database all error in Model.
+[DEV] Database error: Query execution failed: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.activities' doesn't exist
+[2026-01-17 19:46:07] CRITICAL: Database fail in query method
+[DEV] Fail in Database class query function with message:SQLSTATE[42S02]: Base table or view not found: 1146 Table 'php_mvc.admin_invites' doesn't exist

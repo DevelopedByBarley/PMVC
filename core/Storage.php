@@ -171,6 +171,7 @@ class Storage
 
     $destination = $directoryPath . '/' . $originalFileName;
 
+    
     if (!move_uploaded_file($file["tmp_name"], $destination)) {
       Log::error('File move failed', 'Failed to move file to: ' . $destination);
       return false;
@@ -178,6 +179,8 @@ class Storage
 
     // Képfájlok optimalizálása
     $this->optimizeImageIfNeeded($destination);
+
+    Log::info('File uploaded successfully', 'File: ' . $originalFileName . ' to ' . $destination);
 
     return $originalFileName;
   }

@@ -124,8 +124,8 @@ class UserAuthController extends Controller
       return $this->toast->danger('Sikertelen regisztráció, kérjük próbálja meg más adatokkal!')->back();
     }
 
-    $email = sanitize($validated['email']) ?? null;
-    $password = sanitize($validated['password']) ?? null;
+    $email = $validated['email'] ?? null;
+    $password = $validated['password'] ?? null;
 
     $last_id = $this->User->create([
       'name' => $faker->name(),

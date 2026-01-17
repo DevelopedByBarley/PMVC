@@ -9,12 +9,10 @@ use Core\Response;
 
 class TestController extends Controller
 {
-  private Database $db;
   protected $post;
 
   public function __construct()
   {
-    $this->db = Database::getInstance();
     $this->post = new Post();
   }
 

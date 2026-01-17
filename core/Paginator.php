@@ -59,8 +59,10 @@ class Paginator
 	{
 		$this->search = $search;
 		$this->search_columns = $search_columns;
+		
 
 		if (empty($this->search)) return $this;
+
 
 
 		if (is_string($this->search) && !empty($this->search)) {

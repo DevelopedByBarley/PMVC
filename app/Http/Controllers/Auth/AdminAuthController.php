@@ -38,14 +38,15 @@ class AdminAuthController extends Controller
       ])
     ]); */
   }
-  public function create()
+  public function loginPage()
   {
+  
     Session::create();
     if (Session::get('admin')) {
       return Navigator::redirect('/admin/dashboard');
     }
 
-    return Response::view('admin/create', 'admin-layout', [
+    return Response::view('admin/admins/login', 'admin-layout', [
       "errors" => Session::get('errors') ?? []
     ]);
   }
@@ -54,12 +55,13 @@ class AdminAuthController extends Controller
   {
     Session::create();
 
-
     try {
       $validated = $this->request->validate([
-        "email" => ['required'],
+        "email" => ['required', 'email'],
         "password" => ['required'],
       ]);
+
+    
     } catch (ValidationException $exception) {
       Session::flash('errors', $exception->errors);
       Session::flash('old', $exception->old);
@@ -69,8 +71,8 @@ class AdminAuthController extends Controller
 
 
 
-    $email = sanitize($validated['email']) ?? null;
-    $password = sanitize($validated['password']) ?? null;
+    $email = $validated['email'] ?? null;
+    $password = $validated['password'] ?? null;
 
     $authenticated = $this->auth->attempt($email, $password, 'admins');
 
@@ -86,6 +88,52 @@ class AdminAuthController extends Controller
   public function logout()
   {
     $this->auth::logout();
-    return Navigator::redirect('/admin');
+    return Navigator::redirect('/admin/login');
+  }
+
+  public function resetPassword()
+  {
+    try {
+      $validated = $this->request->validate([
+        'id' => ['required', 'integer'],
+        'email' => ['required', 'email'],
+        'current_password' => ['required'],
+        'password' => ['required', 'password'],
+        'password_confirmation' => ['required', 'password'],
+      ]);
+    } catch (ValidationException $e) {
+      Session::flash('errors', $e->errors);
+      Session::flash('old', $e->old);
+      return $this->toast->danger('Hiba a beküldött adatokban.', 'Hiba')->back();
+    }
+    $admin = $this->Admin->findOneBy('email', $validated['email']);
+
+    if (!$admin) {
+      return $this->toast->danger('Nincs ilyen e-mail címmel regisztrált adminisztrátor.')->back();
+    }
+
+
+    if((int)$admin->id !== (int)$validated['id']) {
+      return $this->toast->danger('Hibás adminisztrátor azonosító.')->back();
+    }
+
+    if($validated['password'] !== $validated['password_confirmation']) {
+      return $this->toast->danger('Az új jelszó és a megerősítés nem egyezik.')->back();
+    }
+
+
+    if (!password_verify($validated['current_password'], $admin->password)) {
+      return $this->toast->danger('A jelenlegi jelszó nem megfelelő.')->back();
+    }
+
+    if((int)$validated['id'] !== (int)session('admin')->id) {
+      return $this->toast->danger('Nem módosíthatja más adminisztrátor jelszavát.')->back();
+    }
+
+    $this->Admin->update([
+      'password' => password_hash($validated['password'], PASSWORD_DEFAULT),
+    ], $admin->id);
+
+    return $this->toast->success('Sikeres jelszóváltoztatás.')->redirect('/admin/login');
   }
 }
