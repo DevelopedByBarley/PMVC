@@ -99,6 +99,7 @@
                         <div class="col-12">
                             <label for="current_password" class="form-label fw-semibold">Jelenlegi jelszó</label>
                             <input type="password" class="form-control" id="current_password" name="current_password"
+                                data-validate="required|password"
                                 autocomplete="current-password" placeholder="••••••••">
                             <div class="form-text">Biztonsági okból szükséges lehet.</div>
                             <?= errors('current_password', session('errors') ?? []) ?>

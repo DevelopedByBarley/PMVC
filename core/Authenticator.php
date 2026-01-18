@@ -42,17 +42,20 @@ class Authenticator
 
     // Először ellenőrizzük, hogy létezik-e a user
     if (!$user) {
+      Log::info('Sikertelen bejelentkezés - nem létező email', ['email' => $email, 'table' => $table]);
       return false;
     }
 
     // Ha email verification szükséges és nincs verificálva
     if ($verified && is_null($user->email_verified_at)) {
+      Log::info('Sikertelen bejelentkezés - nem verificált email', ['email' => $email, 'table' => $table]);
       return false;
     }
 
     
     // Jelszó ellenőrzés
     if (password_verify($password, $user->password)) {
+      Log::info('Sikeres bejelentkezés', ['email' => $email, 'table' => $table]);
       $this->login($user, $table); // Teljes user objektumot adjuk át
       return $user;
     }

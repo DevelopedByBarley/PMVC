@@ -11,6 +11,9 @@ class Log
     $logMessage = "[{$timestamp}] {$level}: {$message}" . PHP_EOL;
 
     if ($dev !== null) {
+      if (is_array($dev) || is_object($dev)) {
+        $dev = json_encode($dev, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+      }
       $logMessage .= "[DEV] {$dev}" . PHP_EOL;
     }
 

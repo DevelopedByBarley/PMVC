@@ -5,19 +5,6 @@
 <div class="container-fluid p-4">
 	<div class="row justify-content-center">
 		<div class="col-xl-8 col-xxl-7">
-			<?php if (isset($errors) && !empty($errors)): ?>
-			<div class="alert alert-danger alert-dismissible fade show" role="alert">
-				<h6 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Hiba történt!</h6>
-				<ul class="mb-0">
-					<?php foreach ($errors as $field => $fieldErrors): ?>
-					<?php foreach ($fieldErrors['errors'] as $error): ?>
-					<li><?= $error ?></li>
-					<?php endforeach; ?>
-					<?php endforeach; ?>
-				</ul>
-				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-			</div>
-			<?php endif; ?>
 
 			<form action="/admins" method="POST" novalidate>
 				<?= csrf() ?>
@@ -31,11 +18,13 @@
 							<div class="col-lg-6">
 								<label for="name" class="form-label fw-semibold">Név <span class="text-danger">*</span></label>
 								<input type="text" class="form-control" id="name" name="name" required
+									data-validate="required|min:3|max:100"
 									value="<?= htmlspecialchars(old('name') ?? '') ?>" placeholder="Teljes név">
 							</div>
 							<div class="col-lg-6">
 								<label for="email" class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
 								<input type="email" class="form-control" id="email" name="email" required
+									data-validate="required|email|max:150"
 									value="<?= htmlspecialchars(old('email') ?? '') ?>" placeholder="admin@example.com">
 							</div>
 							<div class="col-lg-6">

@@ -1,0 +1,5 @@
+[2026-01-18 11:25:53] INFO: Admin kijelentkezés kísérlet.
+[DEV] {"admin_id":1}
+[2026-01-18 11:25:53] INFO: Admin kijelentkezés megtörtént
+[2026-01-18 11:26:00] INFO: Admin login próbálkozás
+[DEV] {"email":"arpadsz@max.hu"}

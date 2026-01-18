@@ -27,6 +27,7 @@
                                 <label for="name" class="form-label fw-semibold">Név <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="name" name="name" required
+                                    data-validate="required|min:3|max:100"
                                     value="<?= htmlspecialchars(old('name', $admin->name ?? '')) ?>"
                                     placeholder="Teljes név">
 
@@ -37,6 +38,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="email" name="email" required
                                     value="<?= htmlspecialchars(old('email', $admin->email ?? '')) ?>"
+                                    data-validate="required|min:3|max:100"
                                     placeholder="admin@example.com" disabled>
                                 <?= errors('email', session('errors') ?? []) ?>
                             </div>

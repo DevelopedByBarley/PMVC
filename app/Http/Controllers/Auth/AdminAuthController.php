@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use Core\Log;
 use Core\Navigator;
 use Core\Response;
 use Core\Session;
@@ -54,7 +55,7 @@ class AdminAuthController extends Controller
   public function store()
   {
     Session::create();
-
+    Log::info('Admin login próbálkozás', ['email' => $this->request->key('email')], 'admin');
     try {
       $validated = $this->request->validate([
         "email" => ['required', 'email'],
@@ -63,6 +64,7 @@ class AdminAuthController extends Controller
 
     
     } catch (ValidationException $exception) {
+      Log::warning('Admin login hiba', ['errors' => $exception->errors, 'old' => $exception->old], 'admin');
       Session::flash('errors', $exception->errors);
       Session::flash('old', $exception->old);
       return $this->toast->danger('Sikertelen bejelentkezés, kérjük próbálja meg más adatokkal!')->back();
@@ -87,7 +89,9 @@ class AdminAuthController extends Controller
 
   public function logout()
   {
+    Log::info('Admin kijelentkezés kísérlet.', ['admin_id' => session('admin')->id], 'admin');
     $this->auth::logout();
+    Log::info('Admin kijelentkezés megtörtént', null, 'admin');
     return Navigator::redirect('/admin/login');
   }
 
