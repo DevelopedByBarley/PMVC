@@ -33,6 +33,9 @@ $statCards = [
 ];
 ?>
 
+
+<input class="editor"></input>
+
 <div class="container p-0">
   <div class="d-flex flex-column h-lg-full">
     <div class="h-screen flex-grow-1 overflow-y-lg-auto">

@@ -44,6 +44,15 @@ class Model
       return null;
     }
   }
+
+  public function findOrFail($id)
+  {
+    $record = $this->find($id);
+    if (!$record || empty($record)) {
+      abort(404, "Record with ID $id not found in " . $this->table . " table.");
+    }
+    return $record;
+  }
   
   public function findAll($id)
   {
@@ -113,7 +122,10 @@ class Model
         $params = array_merge($filteredData, ['condition_id' => $condition]);
       }
 
-      return $this->db->query($sql, $params);
+      return (object)[
+        'success' => $this->db->query($sql, $params)->rowCount() > 0,
+        'updated_data' => $filteredData
+      ];
     } catch (Exception $e) {
       Log::critical("Database update error in Model.", "Database error: " . $e->getMessage());
       return false;
@@ -123,7 +135,10 @@ class Model
   public function destroy($id)
   {
     try {
-      return $this->db->query("DELETE FROM $this->table WHERE id = :id", ['id' => $id]);
+      return (object)[
+        'success' => $this->db->query("DELETE FROM $this->table WHERE id = :id", ['id' => $id])->rowCount() > 0,
+        'deleted_id' => $id
+      ];
     } catch (Exception $e) {
       Log::critical("Database destroy error in Model.", "Database error: " . $e->getMessage());
       return false;
