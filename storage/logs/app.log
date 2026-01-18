@@ -4,3 +4,21 @@
 [DEV] {"email":"arpadsz@max.hu","table":"admins"}
 [2026-01-18 11:26:00] INFO: Sikeres bejelentkezés
 [DEV] {"email":"arpadsz@max.hu","table":"admins"}
+[2026-01-18 11:31:25] INFO: Sikeres bejelentkezés
+[DEV] {"email":"developedbybarley@gmail.com","table":"admins"}
+[2026-01-18 11:35:17] INFO: Admin frissítése: arpadsz@max.hu
+[DEV] {"admin":"developedbybarley@gmail.com"}
+[2026-01-18 11:35:45] INFO: Admin frissítése: arpadsz@max.hu
+[DEV] {"admin":"developedbybarley@gmail.com"}
+[2026-01-18 11:36:08] INFO: Admin frissítése: arpadsz@max.hu
+[DEV] {"admin":"developedbybarley@gmail.com"}
+[2026-01-18 11:36:15] INFO: Admin frissítése: arpadsz@max.hu
+[DEV] {"admin":"developedbybarley@gmail.com"}
+[2026-01-18 11:36:22] INFO: Admin frissítése: developedbybarley@gmail.com
+[DEV] {"admin":"developedbybarley@gmail.com"}
+[2026-01-18 11:36:56] INFO: Sikeres bejelentkezés
+[DEV] {"email":"arpadsz@max.hu","table":"admins"}
+[2026-01-18 11:37:01] INFO: Admin frissítése: arpadsz@max.hu
+[DEV] {"admin":"arpadsz@max.hu"}
+[2026-01-18 11:37:37] INFO: Admin törlése: developedbybarley@gmail.com
+[DEV] {"admin":"arpadsz@max.hu"}

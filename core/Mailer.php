@@ -106,6 +106,7 @@ class Mailer
   public function send()
   {
     if ($this->mail->send()) {
+      Log::info('E-mail sikeresen elküldve: ' . implode(', ', array_column($this->mail->getToAddresses(), 0)), ['to' => $this->mail->getToAddresses()], 'mail');
       return true;
     } else {
       // Hibák kiíratása, ha a küldés nem sikerül

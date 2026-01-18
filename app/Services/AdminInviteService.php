@@ -6,6 +6,7 @@ use PDO;
 use RuntimeException;
 use App\Traits\GeneratesTokens;
 use Core\Database;
+use Core\Log;
 use Exception;
 
 class AdminInviteService
@@ -37,6 +38,8 @@ class AdminInviteService
             'expires_at' => $expiresAt,
         ]);
 
+        Log::info("Új admin meghívó létrehozva", ['admin_id' => $adminId, 'email' => $admin['email'], 'token' => $token], 'admin');
+
         return $token;
     }
 
@@ -57,6 +60,7 @@ class AdminInviteService
             abort(404, 'Érvénytelen vagy lejárt meghívó token.');
         }
 
+        Log::info("Admin meghívó érvényesítve", ['token' => $token], 'admin');
         return $invite;
     }
 
@@ -66,10 +70,12 @@ class AdminInviteService
     public function acceptInvite($token, $name, $password, $role = 'admin')
     {
         if (strlen($password) < 8) {
+            Log::warning("Admin meghívó elfogadása sikertelen - túl rövid jelszó", ['token' => $token], 'admin');
             throw new RuntimeException('A jelszó túl rövid.');
         }
 
         if (!in_array($role, ['admin', 'editor'], true)) {
+            Log::warning("Admin meghívó elfogadása sikertelen - érvénytelen role", ['token' => $token, 'role' => $role], 'admin');
             throw new RuntimeException('Érvénytelen role.');
         }
 
@@ -85,7 +91,9 @@ class AdminInviteService
                   AND accepted_at IS NULL
             ", ['token' => $token])->find(PDO::FETCH_ASSOC);
 
+
             if (!$invite) {
+                Log::warning("Admin meghívó elfogadása sikertelen - érvénytelen meghívó", ['token' => $token], 'admin');
                 $this->db->connection->rollBack();
                 throw new RuntimeException('A meghívás nem érvényes.');
             }
@@ -101,6 +109,8 @@ class AdminInviteService
                 'role' => $role,
             ]);
 
+            Log::info("Admin meghívó elfogadva, új admin létrehozva", ['admin_email' => $invite['email'], 'role' => $role], 'admin');
+
             // invite lezárása
             $this->db->query("
                 UPDATE admin_invites
@@ -108,8 +118,11 @@ class AdminInviteService
                 WHERE id = :id
             ", ['id' => $invite['id']]);
 
+            Log::info("Admin meghívó lezárva", ['token' => $token], 'admin');
+
             $this->db->connection->commit();
         } catch (Exception $e) {
+            Log::error("Hiba történt az admin meghívó elfogadásakor", ['token' => $token, 'error' => $e->getMessage()], 'admin');
             $this->db->connection->rollBack();
             throw $e;
         }
@@ -122,6 +135,8 @@ class AdminInviteService
             DELETE FROM admin_invites
             WHERE token = :token
         ", ['token' => $token]);
+
+        Log::info("Admin meghívó token törölve", ['token' => $token], 'admin');
     }
 
 

@@ -249,6 +249,18 @@ class Database
     }
 
     /**
+     * Returns the number of affected rows from the last executed statement.
+     */
+    public function rowCount(): int
+    {
+        if (!$this->statement) {
+            return 0;
+        }
+
+        return $this->statement->rowCount();
+    }
+
+    /**
      * Fetches all results from the executed query.
      *
      * @param int $ret_type The fetch mode (default is PDO::FETCH_OBJ).

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Model;
 use Core\Authenticator;
+use Core\Log;
 use Core\Password;
 
 class Admin extends Model
@@ -28,11 +29,13 @@ class Admin extends Model
   public function createAdmin(array $data)
   {
     if (isset($data['password'])) {
+      Log::info('Admin hashelés: ' . $data['email'], ['admin' => $data['email']], 'admin');
       $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
     }
     
     // Default role for admin if not specified
     if (!isset($data['role'])) {
+      Log::info('Admin szerepkör beállítása: admin', ['admin' => $data['email']], 'admin');
       $data['role'] = 'admin';
     }
     

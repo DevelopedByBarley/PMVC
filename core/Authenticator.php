@@ -36,6 +36,12 @@ class Authenticator
   {
     $db = Database::getInstance();
 
+    Log::info('Bejelentkezési kísérlet', [
+      'email' => $email,
+      'table' => $table,
+      'verified_required' => $verified
+    ]);
+
     $user = $db->query("SELECT * FROM $table WHERE email = :email", [
       'email' => $email
     ])->find();
@@ -60,6 +66,7 @@ class Authenticator
       return $user;
     }
 
+    Log::warning('Sikertelen bejelentkezés - hibás jelszó', ['email' => $email, 'table' => $table]);
     return false;
   }
 
@@ -76,11 +83,22 @@ class Authenticator
     // Teljes user objektum tárolása session-ben
     $_SESSION[$entity] = $user;
 
+    Log::info('Felhasználó bejelentkezve', [
+      'table' => $table,
+      'entity' => $entity,
+      'user_id' => $user->id ?? null,
+      'email' => $user->email ?? null,
+    ]);
+
     session_regenerate_id(true);
   }
 
   public static function logout()
   {
+    Log::info('Kijelentkezés', [
+      'entities' => array_keys($_SESSION ?? []),
+    ]);
+
     $_SESSION = [];
     session_destroy();
 

@@ -3,3 +3,31 @@
 [2026-01-18 11:25:53] INFO: Admin kijelentkezés megtörtént
 [2026-01-18 11:26:00] INFO: Admin login próbálkozás
 [DEV] {"email":"arpadsz@max.hu"}
+[2026-01-18 11:29:24] INFO: Új admin meghívó létrehozva
+[DEV] {"admin_id":"3","email":"developedbybarley@gmail.com","token":"abc9874d58f8c27ec1f30d3334d14390991912680ab430e6a61ffb07597be391"}
+[2026-01-18 11:29:34] INFO: Admin meghívó érvényesítve
+[DEV] {"token":"abc9874d58f8c27ec1f30d3334d14390991912680ab430e6a61ffb07597be391"}
+[2026-01-18 11:29:43] INFO: Admin meghívó érvényesítve
+[DEV] {"token":"abc9874d58f8c27ec1f30d3334d14390991912680ab430e6a61ffb07597be391"}
+[2026-01-18 11:31:01] INFO: Admin meghívó érvényesítve
+[DEV] {"token":"abc9874d58f8c27ec1f30d3334d14390991912680ab430e6a61ffb07597be391"}
+[2026-01-18 11:31:02] INFO: Admin meghívó érvényesítve
+[DEV] {"token":"abc9874d58f8c27ec1f30d3334d14390991912680ab430e6a61ffb07597be391"}
+[2026-01-18 11:31:08] INFO: Admin meghívó érvényesítve
+[DEV] {"token":"abc9874d58f8c27ec1f30d3334d14390991912680ab430e6a61ffb07597be391"}
+[2026-01-18 11:31:08] INFO: Admin meghívó token törölve
+[DEV] {"token":"abc9874d58f8c27ec1f30d3334d14390991912680ab430e6a61ffb07597be391"}
+[2026-01-18 11:31:17] INFO: Admin kijelentkezés kísérlet.
+[DEV] {"admin_id":1}
+[2026-01-18 11:31:17] INFO: Admin kijelentkezés megtörtént
+[2026-01-18 11:31:25] INFO: Admin login próbálkozás
+[DEV] {"email":"developedbybarley@gmail.com"}
+[2026-01-18 11:36:49] INFO: Admin kijelentkezés kísérlet.
+[DEV] {"admin_id":3}
+[2026-01-18 11:36:49] INFO: Admin kijelentkezés megtörtént
+[2026-01-18 11:36:56] INFO: Admin login próbálkozás
+[DEV] {"email":"arpadsz@max.hu"}
+[2026-01-18 11:38:19] INFO: Admin frissítése: arpadsz@max.hu
+[DEV] {"admin":"arpadsz@max.hu"}
+[2026-01-18 11:41:09] INFO: Admin létrehozása oldal megnyitva
+[DEV] {"admin":"arpadsz@max.hu"}
