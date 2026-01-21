@@ -40,7 +40,7 @@ class Mailer
     } else {
       $this->mail = new PHPMailer();
       $this->mail->isSMTP();
-      // $this->mail->SMTPDebug = 3;
+       $this->mail->SMTPDebug = 3;
 
       // SMTP beállítások alkalmazása
       $this->mail->Host = $config['host'];

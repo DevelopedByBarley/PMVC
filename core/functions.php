@@ -32,6 +32,15 @@ function errors($key, $errors)
   }
 }
 
+function image($path, $fileName) {
+    $fullPath = base_path('public' . $path . '/' . $fileName);
+
+    if(file_exists($fullPath) && !empty($fileName)) {
+        return "/public" . $path . '/' . $fileName;
+    }
+
+}
+
 // Source - https://stackoverflow.com/a
 // Posted by Maerlyn, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-01-07, License - CC BY-SA 4.0
@@ -237,6 +246,34 @@ function base_path($path)
   return BASE_PATH . $path;
 }
 
+
+function truncate($text, $chars = 25)
+{
+  // Null vagy üres szöveg kezelése
+  if (empty($text)) {
+    return 'Empty text in truncate()';
+  }
+
+  // HTML tagek eltávolítása és entitások visszaalakítása
+  $text = strip_tags(html_entity_decode($text, ENT_QUOTES | ENT_HTML5));
+
+  // Ha rövidebb mint a limit, visszaadjuk teljes egészében
+  if (mb_strlen($text) <= $chars) {
+    return $text;
+  }
+
+  // Szavakon belül vágunk
+  $truncated = mb_substr($text, 0, $chars);
+  
+
+  $lastSpace = mb_strrpos($truncated, ' ');
+  if ($lastSpace !== false && $lastSpace > $chars * 0.7) { 
+    $truncated = mb_substr($truncated, 0, $lastSpace);
+  }
+
+  return trim($truncated) . '...';
+}
+
 function view($path, $root = '', $params = [], $engine = false): string
 {
   // Ha $root üres string, akkor nem adunk hozzá semmit
@@ -256,7 +293,7 @@ function view($path, $root = '', $params = [], $engine = false): string
   // Ellenőrizzük, hogy létezik-e a template fájl
   $filePath = base_path('resources/views/' . $path . '.blade.php');
   if (!file_exists($filePath)) {
-    abort(404);
+    throw new \Exception("View file not found: " . $filePath);
   }
 
   $output = '';
@@ -632,4 +669,13 @@ function getHeader($name, $default = null)
   }
 
   return $default;
+}
+
+
+function getBool($value) {
+      if(!isset($value)) {
+        return 0;
+      }
+
+      return 1;
 }

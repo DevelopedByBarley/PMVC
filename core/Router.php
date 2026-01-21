@@ -21,7 +21,7 @@ class Router
 		'index'   => ['GET', ''],
 		'show'    => ['GET', '/{id}'],
 		'create'  => ['GET', '/create'],
-		'edit'    => ['GET', '/edit/{id}'],
+		'edit'    => ['GET', '/{id}/edit'],
 		'store'   => ['POST', ''],
 		'update'  => ['PATCH', '/{id}'],
 		'destroy' => ['DELETE', '/{id}'],
@@ -89,6 +89,7 @@ class Router
 
 		foreach ($resourceRoutes as $action => [$method, $suffix]) {
 			$this->{strtolower($method)}("/{$uri}{$suffix}", [$controller, $action]);
+
 			if ($middleware) {
 				$this->middleware($middleware);
 			}
@@ -290,7 +291,8 @@ class Router
 	{
 		$pattern = $this->buildRoutePattern($routeUri);
 		preg_match($pattern, $uri, $matches);
-		return isset($matches[1]) ? (int)$matches[1] : [];
+		array_shift($matches); // Első elem eltávolítása (teljes egyezés)
+		return $matches;
 	}
 
 	/**
@@ -370,8 +372,11 @@ class Router
 			}
 
 			(new $controllerClass)->$method($params);
+			unset($_SESSION['errors'], $_SESSION['old']);
+
 			return;
 		}
+
 
 		throw new \Exception("Invalid controller format.");
 	}

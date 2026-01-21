@@ -23,12 +23,12 @@ class Model
   }
 
 
-  public function all($withPaginate = false, $search = [], $search_columns = [])
+  public function all($withPaginate = false, $search = [], $search_columns = [], $orderBy = null, $orderDirection = 'ASC')
   {
     try {
       return !$withPaginate
-        ? $this->db->query("SELECT * FROM $this->table")->get()
-        : $this->db->query("SELECT * FROM $this->table")->paginate(25, $search, $search_columns);
+        ? $this->db->query("SELECT * FROM $this->table" . ($orderBy ? " ORDER BY $orderBy $orderDirection" : ""))->get()
+        : $this->db->query("SELECT * FROM $this->table" . ($orderBy ? " ORDER BY $orderBy $orderDirection" : ""))->paginate(25, $search, $search_columns);
     } catch (Exception $e) {
       Log::critical("Database all error in Model.", "Database error: " . $e->getMessage());
       return null;
@@ -53,7 +53,7 @@ class Model
     }
     return $record;
   }
-  
+
   public function findAll($id)
   {
     try {
@@ -110,7 +110,7 @@ class Model
       }
 
       $set = implode(", ", array_map(fn($key) => "$key = :$key", array_keys($filteredData)));
-      
+
       // Check if condition contains placeholders or raw SQL
       if (strpos($condition, ':') !== false || strpos($condition, '=') !== false) {
         // Raw condition like "id = 123" or with placeholders
@@ -141,6 +141,18 @@ class Model
       ];
     } catch (Exception $e) {
       Log::critical("Database destroy error in Model.", "Database error: " . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function destroyAll()
+  {
+    try {
+      return (object)[
+        'success' => $this->db->query("DELETE FROM $this->table")->rowCount() > 0,
+      ];
+    } catch (Exception $e) {
+      Log::critical("Database destroyAll error in Model.", "Database error: " . $e->getMessage());
       return false;
     }
   }
@@ -211,12 +223,12 @@ class Model
 
       $whereClause = [];
       $params = [];
-      
+
       foreach ($conditions as $column => $value) {
         $whereClause[] = "$column = :$column";
         $params[$column] = $value;
       }
-      
+
       $sql = "SELECT * FROM $this->table WHERE " . implode(' AND ', $whereClause);
       return $this->db->query($sql, $params)->get();
     } catch (Exception $e) {
@@ -235,7 +247,7 @@ class Model
       if (!in_array($direction, ['ASC', 'DESC'])) {
         $direction = 'ASC';
       }
-      
+
       return $this->db->query("SELECT * FROM $this->table ORDER BY $column $direction")->get();
     } catch (Exception $e) {
       Log::critical("Database orderBy error in Model.", "Database error: " . $e->getMessage());
@@ -289,8 +301,10 @@ class Model
   {
     try {
       $data = ['deleted_at' => date('Y-m-d H:i:s')];
-      return $this->db->query("UPDATE $this->table SET deleted_at = :deleted_at WHERE id = :id", 
-        array_merge($data, ['id' => $id]));
+      return $this->db->query(
+        "UPDATE $this->table SET deleted_at = :deleted_at WHERE id = :id",
+        array_merge($data, ['id' => $id])
+      );
     } catch (Exception $e) {
       Log::critical("Database softDelete error in Model.", "Database error: " . $e->getMessage());
       return false;

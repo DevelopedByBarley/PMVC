@@ -86,7 +86,6 @@ class Validator
     $rules = static::structure($rules);
 
     foreach ($request as $req_key => $req_value) {
-      $req_value = sanitize($req_value);
       $validator = $rules[$req_key] ?? [];
 
       foreach ($validator as $val_value) {

@@ -16,25 +16,55 @@
           <!-- Icon based on toast type -->
           <div class="me-2">
             <?php
-            $icon = match ($toast['type'] ?? 'info') {
-              'success' => '<i class="fas fa-check-circle"></i>',
-              'danger', 'error' => '<i class="fas fa-exclamation-circle"></i>',
-              'warning' => '<i class="fas fa-exclamation-triangle"></i>',
-              'info' => '<i class="fas fa-info-circle"></i>',
-              default => '<i class="fas fa-bell"></i>'
-            };
+            $type = $toast['type'] ?? 'info';
+            switch ($type) {
+              case 'success':
+                $icon = '<i class="fas fa-check-circle"></i>';
+                break;
+              case 'danger':
+              case 'error':
+                $icon = '<i class="fas fa-exclamation-circle"></i>';
+                break;
+              case 'warning':
+                $icon = '<i class="fas fa-exclamation-triangle"></i>';
+                break;
+              case 'info':
+                $icon = '<i class="fas fa-info-circle"></i>';
+                break;
+              default:
+                $icon = '<i class="fas fa-bell"></i>';
+                break;
+            }
             echo $icon;
             ?>
           </div>
 
           <strong class="me-auto">
-            <?= $toast['title'] ?? match ($toast['type'] ?? 'info') {
-              'success' => 'Siker',
-              'danger', 'error' => 'Hiba',
-              'warning' => 'Figyelmeztetés',
-              'info' => 'Információ',
-              default => 'Üzenet'
-            } ?>
+            <?php
+            if (isset($toast['title'])) {
+              echo $toast['title'];
+            } else {
+              $type = $toast['type'] ?? 'info';
+              switch ($type) {
+                case 'success':
+                  echo 'Siker';
+                  break;
+                case 'danger':
+                case 'error':
+                  echo 'Hiba';
+                  break;
+                case 'warning':
+                  echo 'Figyelmeztetés';
+                  break;
+                case 'info':
+                  echo 'Információ';
+                  break;
+                default:
+                  echo 'Üzenet';
+                  break;
+              }
+            }
+            ?>
           </strong>
 
           <?php if (isset($toast['time'])): ?>
